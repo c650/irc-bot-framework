@@ -53,7 +53,7 @@ namespace IRC {
 			return port;
 		}
 
-		const Packet& receive();
+		Packet&& receive();
 		void privmsg(const std::string& chan, const std::string& msg);
 
 	private:
@@ -108,7 +108,7 @@ namespace IRC {
 		this->_send("\rJOIN " + chan + "\r\n");
 	}
 
-	const Packet& Server::receive() {
+	Packet&& Server::receive() {
 		char *buf = new char[4096];
 
 		read(connection_socket_fd , buf , 4095);
@@ -118,6 +118,10 @@ namespace IRC {
 		delete[] buf;
 
 		return p;
+	}
+
+	void Server::privmsg(const std::string& chan, const std::string& msg) {
+		this->_send("\rPRIVMSG " + chan + " :" + msg + "\r\n");
 	}
 
 	/* helpers */
