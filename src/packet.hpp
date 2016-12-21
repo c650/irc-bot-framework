@@ -2,6 +2,7 @@
 #define _IRC_PACKET_H
 
 #include <string>
+#include <vector>
 
 #include "./types.hpp"
 #include "./server.hpp"
@@ -18,7 +19,7 @@ namespace IRC {
 
 					content;
 
-		const Server *owner;
+		Server *owner;
 
 	private:
 
@@ -26,20 +27,19 @@ namespace IRC {
 
 	public:
 
-		Packet() : valid(false) {}
+		Packet() : valid(false), owner(nullptr) {}
 
-		// Packet(std::string& pkt, const Server* o = nullptr)
-		// 	: Packet(pkt.data(), o) {}
-
-		Packet(char *buf, const Server* o = nullptr) : owner(o) {
+		Packet(char *buf) : owner(nullptr) {
 			valid = _parse(buf);
 		}
 
-		bool is_valid() const {
+		bool is_valid(void) const {
 			return valid;
 		}
 
 		void reply(std::string msg) const;
+
+		void get_args(std::vector<std::string>& vec) const;
 
 	private:
 

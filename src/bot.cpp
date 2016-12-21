@@ -10,29 +10,36 @@ namespace IRC {
 		admins.push_back(first_admin);
 	}
 
+	Bot::~Bot() {
+		for (Server* s : servers) {
+			if (s)
+				delete s;
+		}
+	}
+
 	void Bot::add_server(const std::string& n , const std::string& a , const unsigned int& port) {
-		servers.push_back( Server(n,a,port) );
+		servers.push_back( new Server(n,a,port) );
 	}
 
 	void Bot::connect_server(const std::string& server_name) {
 		this->connect_server( _find_server_by_name(server_name) );
 	}
 
-	void Bot::connect_server(const std::vector<Server>::iterator& it) {
+	void Bot::connect_server(const std::vector<Server*>::iterator& it) {
 		if (it == servers.end())
 			return;
-		it->start_connect();
-		it->log_on(nick, password);
+		(*it)->start_connect();
+		(*it)->log_on(nick, password);
 	}
 
 	bool Bot::join_channel(const std::string& server_name , const std::string& channel_name) {
 		return this->join_channel( _find_server_by_name(server_name) , channel_name );
 	}
-	bool Bot::join_channel(const std::vector<Server>::iterator& it, const std::string& channel_name) {
+	bool Bot::join_channel(const std::vector<Server*>::iterator& it, const std::string& channel_name) {
 		if (it == servers.end())
 			return false;
 
-		it->join_channel(channel_name);
+		(*it)->join_channel(channel_name);
 		return true;
 	}
 
@@ -42,8 +49,9 @@ namespace IRC {
 			got_resp = false;
 
 			Packet p;
-			for (auto& s : servers) {
-				p = s.receive();
+			for (Server* s : servers) {
+				p = s->receive();
+				p.owner = s;
 				if (p.is_valid()) {
 					this->_check_for_triggers(p);
 					got_resp = true;
@@ -68,9 +76,9 @@ namespace IRC {
 		}
 	}
 
-	std::vector<Server>::iterator Bot::_find_server_by_name(const std::string& n) {
+	std::vector<Server*>::iterator Bot::_find_server_by_name(const std::string& n) {
 		 for (size_t i = 0; i < servers.size(); ++i) {
-			 if (servers.at(i).get_name() == n) {
+			 if (servers.at(i)->get_name() == n) {
 				 return servers.begin() + i;
 			 }
 		 }

@@ -24,23 +24,13 @@ namespace IRC {
 
 	class Server {
 
-		struct Channel {
-
-			std::string name;
-			std::vector<std::string> modes;
-
-			Channel(const std::string& n)
-				: name(n) {}
-
-		};
-
 		std::string name;
 		std::string address;
 		int port;
 
 		int connection_socket_fd;
 
-		std::vector<Channel> channels;
+		std::vector< std::string > channels;
 
 	public:
 
@@ -49,8 +39,10 @@ namespace IRC {
 		~Server();
 
 		bool start_connect();
+		void disconnect(const std::string& msg = "Leaving");
 
 		void join_channel(const std::string& chan);
+		void part_channel(const std::string& chan);
 
 		std::string get_name() const {
 			return name;

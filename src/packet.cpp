@@ -35,8 +35,8 @@ namespace IRC {
 		this->hostname = strtok(nullptr, " ");
 
 		this->type = strtok(nullptr, " ");
-		if (this->type == "JOIN") {
-			this->channel = strtok(nullptr, "\0") + 1;
+		if (this->type == "JOIN" || this->type == "PART") {
+			this->channel = strtok(nullptr, "\0") + (this->type == "JOIN" ? 1 : 0);
 			return true;
 		}
 
@@ -55,4 +55,19 @@ namespace IRC {
 		std::cout << "\tPacket successfully analyzed.\n";
 		return true;
 	}
+
+	void Packet::get_args( std::vector<std::string>& vec ) const {
+		std::cout << "Analyzing: " << content << "\n";
+
+		size_t last = 0, next = 0;
+		while(last < content.length() && (next = content.find(" ", last)) != std::string::npos) {
+			vec.push_back(content.substr(last, next-last));
+
+			last = next+1;
+			while(last < content.length() && content[last] == ' ')
+				last++;
+		}
+		vec.push_back(content.substr(last));
+	}
+
 }

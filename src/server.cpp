@@ -22,8 +22,7 @@ namespace IRC {
 		{}
 
 	Server::~Server() {
-		_send("\rQUIT :Quit: Leaving...\r\n");
-		close(connection_socket_fd);
+		this->disconnect();
 	}
 
 
@@ -64,15 +63,33 @@ namespace IRC {
 		return true;
 	}
 
+	void Server::disconnect(const std::string& msg) {
+		_send("\rQUIT :Quit: " + msg + "\r\n");
+		sleep(5);
+		close(connection_socket_fd);
+		connection_socket_fd = -1;
+	}
+
 	void Server::join_channel(const std::string& chan) {
 		bool found_chan = false;
 		for (size_t i = 0; i < channels.size() ; ++i)
-			found_chan = channels.at(i).name == chan;
+			found_chan = found_chan || channels.at(i) == chan;
 
 		if (!found_chan)
-			channels.push_back( Channel(chan) );
+			channels.push_back( chan );
 
 		this->_send("\rJOIN " + chan + "\r\n");
+	}
+
+	void Server::part_channel(const std::string& chan) {
+		for (size_t i = 0 ; i < channels.size(); ++i) {
+			if (channels.at(i) == chan) {
+				channels.erase(channels.begin()+i);
+				break;
+			}
+		}
+
+		_send("\rPART " + chan + "\r\n");
 	}
 
 	Packet Server::receive() {
@@ -89,7 +106,7 @@ namespace IRC {
 			_send(s);
 		}
 
-		Packet p(buf, this);
+		Packet p(buf);
 
 		// add auto-rejoin here.
 		// add invite here...
@@ -101,8 +118,6 @@ namespace IRC {
 
 			join_channel( p.channel );
 
-		} else if (p.type == "MODE") {
-			
 		}
 
 		delete[] buf;
@@ -116,6 +131,8 @@ namespace IRC {
 
 	/* helpers */
 	unsigned int Server::_send(const std::string& msg) const {
+		if (connection_socket_fd < 0) return 0;
+
 		std::cout << "Sending: " << msg;
 		return write( this->connection_socket_fd , msg.data() , msg.length() );
 	}
