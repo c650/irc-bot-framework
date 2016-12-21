@@ -15,6 +15,11 @@ namespace IRC {
 			if (s)
 				delete s;
 		}
+
+		for (Command* c : commands) {
+			if (c)
+				delete c;
+		}
 	}
 
 	void Bot::add_server(const std::string& n , const std::string& a , const unsigned int& port) {
@@ -65,12 +70,10 @@ namespace IRC {
 	/* helpers */
 
 	void Bot::_check_for_triggers(const Packet& p) {
-		/*if (p.type == "JOIN") {
-
-		} */ if (p.type == "PRIVMSG") {
-			for (auto& action : this->actions) {
-				if (p.content.substr(0 , action.first.length()) == action.first) {
-					action.second(p);
+		if (p.type == "PRIVMSG") {
+			for (Command* command : this->commands) {                                      /* checks sender's perms.... */
+				if (p.content.substr(0 , command->trigger.length()) == command->trigger && ( !command->requires_admin || _is_admin(p.sender) )) {
+					command->func(p);
 				}
 			}
 		}
@@ -85,5 +88,11 @@ namespace IRC {
 		 return servers.end();
 	}
 
-
+	bool Bot::_is_admin(const std::string& person) {
+		for (auto& a : admins)
+			if (a == person)
+				return true;
+		std::cout << person << " is not an admin.\n";
+		return false;
+	}
 };

@@ -56,6 +56,7 @@ namespace IRC {
 
 		Packet receive();
 		void privmsg(const std::string& chan, const std::string& msg) const;
+		void kick(const std::string& chan, const std::string& user) const;
 
 		bool operator==(Server& other) const {
 			return this->name == other.name && this->connection_socket_fd == other.connection_socket_fd

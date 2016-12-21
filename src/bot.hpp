@@ -16,6 +16,15 @@ namespace IRC {
 
 	class Bot {
 
+		struct Command {
+			std::string trigger, desc;
+			std::function<void(const Packet&)> func;
+			bool requires_admin;
+
+			Command(const std::string& t , std::function<void(const Packet&)> f, const std::string& d, bool ra)
+				: trigger(t), func(f), desc(d), requires_admin(ra) {}
+		};
+
 		std::string nick;
 		std::string password;
 
@@ -24,7 +33,7 @@ namespace IRC {
 
 		std::vector< Server* > servers;
 
-		std::unordered_map<std::string, std::function<void(const Packet& p)>> actions;
+		std::vector<Command*> commands;
 
 	public:
 
@@ -47,7 +56,7 @@ namespace IRC {
 				void f(const Packet& p);
 		*/
 		template <class Func>
-		void on_privmsg(const std::string& trigger, Func f);
+		void on_privmsg(const std::string& trigger, Func f, const std::string& desc, bool requires_admin = false);
 
 		template <class Func>
 		void on_join(Func f);
@@ -63,11 +72,13 @@ namespace IRC {
 
 		void _check_for_triggers(const Packet& p);
 		std::vector<Server*>::iterator _find_server_by_name(const std::string& n);
+
+		bool _is_admin(const std::string& person);
 	};
 
 	template <class Func>
-	void Bot::on_privmsg(const std::string& trigger, Func f) {
-		actions[trigger] = f;
+	void Bot::on_privmsg(const std::string& trigger, Func f, const std::string& desc, bool requires_admin) {
+		commands.push_back( new Command(trigger, f , desc, requires_admin) );
 	}
 };
 #endif

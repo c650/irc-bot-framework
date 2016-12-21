@@ -82,8 +82,9 @@ namespace IRC {
 	}
 
 	void Server::part_channel(const std::string& chan) {
+		std::string chan_name = chan.substr(0, chan.find(" "));
 		for (size_t i = 0 ; i < channels.size(); ++i) {
-			if (channels.at(i) == chan) {
+			if (channels.at(i) == chan_name) {
 				channels.erase(channels.begin()+i);
 				break;
 			}
@@ -127,6 +128,10 @@ namespace IRC {
 
 	void Server::privmsg(const std::string& chan, const std::string& msg) const {
 		this->_send("\rPRIVMSG " + chan + " :" + msg + "\r\n");
+	}
+
+	void Server::kick(const std::string& chan, const std::string& user) const {
+		this->_send("\rKICK " + chan + " " + user + "\r\n");
 	}
 
 	/* helpers */
