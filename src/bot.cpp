@@ -71,9 +71,18 @@ namespace IRC {
 
 	void Bot::_check_for_triggers(const Packet& p) {
 		if (p.type == "PRIVMSG") {
+			bool sender_is_admin = _is_admin(p.sender);
+			if (p.content.substr(0, 5) == "@help") {
+				for (Command* command : this->commands) {
+					if (sender_is_admin || !command->requires_admin)
+						p.owner->privmsg(p.sender, command->trigger + ": " + command->desc);
+				}
+				return;
+			}
 			for (Command* command : this->commands) {                                      /* checks sender's perms.... */
-				if (p.content.substr(0 , command->trigger.length()) == command->trigger && ( !command->requires_admin || _is_admin(p.sender) )) {
+				if (p.content.substr(0 , command->trigger.length()) == command->trigger && ( !command->requires_admin || sender_is_admin )) {
 					command->func(p);
+					break;
 				}
 			}
 		}
