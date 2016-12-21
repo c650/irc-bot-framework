@@ -59,18 +59,12 @@ namespace IRC {
 	void Bot::_check_for_triggers(const Packet& p) {
 		/*if (p.type == "JOIN") {
 
-		} else if (p.type == "KICK") {
-
-		} else*/ if (p.type == "PRIVMSG") {
+		} */ if (p.type == "PRIVMSG") {
 			for (auto& action : this->actions) {
 				if (p.content.substr(0 , action.first.length()) == action.first) {
 					action.second(p);
 				}
 			}
-		} else if (p.type == "INVITE") {
-			std::cout << "Invited to " << p.content << ". Joining...\n";
-
-			this->join_channel(p.owner->get_name(), p.content);
 		}
 	}
 

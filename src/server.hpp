@@ -62,7 +62,7 @@ namespace IRC {
 			return port;
 		}
 
-		Packet receive() const;
+		Packet receive();
 		void privmsg(const std::string& chan, const std::string& msg) const;
 
 		bool operator==(Server& other) const {

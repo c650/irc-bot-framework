@@ -75,7 +75,7 @@ namespace IRC {
 		this->_send("\rJOIN " + chan + "\r\n");
 	}
 
-	Packet Server::receive() const {
+	Packet Server::receive() {
 		char *buf = new char[4096];
 		for (int i = 0; i < 4096; ++i)
 			buf[i] = 0x00;
@@ -89,10 +89,21 @@ namespace IRC {
 			_send(s);
 		}
 
+		Packet p(buf, this);
+
 		// add auto-rejoin here.
 		// add invite here...
+		if (p.type == "INVITE") {
 
-		Packet p(buf, this);
+			join_channel( p.content );
+
+		} else if (p.type == "KICK") {
+
+			join_channel( p.channel );
+
+		} else if (p.type == "MODE") {
+			
+		}
 
 		delete[] buf;
 
