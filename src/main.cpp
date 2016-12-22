@@ -1,13 +1,30 @@
 #include "./bot.hpp"
 #include "./packet.hpp"
 
+#include <iostream>
+#include <fstream>
+
 #include <unistd.h>
+#include <curl/curl.h>
+#include <cstring>
+#include <random>
 
 #define REQUIRES_ADMIN_PERMS true
 
+std::vector<std::string> babbles;
+std::minstd_rand random_number_gen;
+
+void format_query(const std::string& query_str, std::string& result);
+static void readlines(const std::string& filename, std::vector<std::string>& result);
+
+std::string get_a_babble() {
+	return babbles.empty() ? std::string("No Babbles atm.") : babbles.at(random_number_gen() % babbles.size());
+}
+
 int main(void) {
 
-	std::cout << getpid() << '\n';
+	random_number_gen.seed(getpid());
+	readlines("./customize/techno_babble.txt", babbles);
 
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
 	IRC::Bot b("pinetree", "hi", "oaktree");
@@ -20,6 +37,16 @@ int main(void) {
 	b.on_privmsg("@slap ", [](const IRC::Packet& packet){
 		packet.reply("\001ACTION slapped the hell outta " + packet.content.substr(6) + "\001");
 	}, "slaps argument");
+
+	b.on_privmsg("@google ", [](const IRC::Packet& packet){
+		std::string link = "https://google.com/search?q=";
+		format_query( packet.content.substr(8) , link );
+		packet.reply("Does this work? " + link);
+	}, "returns a valid google search query link");
+
+	b.on_privmsg("@babble", [](const IRC::Packet& packet){
+		packet.reply(get_a_babble());
+	}, "produces random technobabble");
 
 	b.on_privmsg("@kick ", [](const IRC::Packet& packet){
 		packet.owner->kick(packet.channel, packet.content.substr(6));
@@ -47,4 +74,44 @@ int main(void) {
 
 
 	return 0;
+}
+
+void format_query(const std::string& query_str, std::string& result) {
+
+	CURL *curl = curl_easy_init();
+	if (curl == nullptr) {
+		return;
+	}
+
+	char *escaped;
+	char *query_str_char_ptr = strdup(query_str.data());
+	char *token = strtok(query_str_char_ptr, ",;?!-_ \n\r");
+
+	while (token != nullptr) {
+
+		escaped = curl_easy_escape(curl, token, strlen(token));
+
+		std::cout << escaped << '\n';
+
+		result.append(std::string(escaped) + '+');
+
+		token = strtok(nullptr, ",.:;?!-_ ");
+
+		curl_free(escaped);
+	}
+
+	result.pop_back(); // remove last '+';
+
+	free(query_str_char_ptr);
+	curl_easy_cleanup(curl);
+}
+
+static void readlines(const std::string& filename, std::vector<std::string>& result) {
+	std::fstream fs(filename, std::fstream::in);
+
+	std::string tmp;
+	while(std::getline(fs, tmp))
+		result.push_back(tmp);
+
+	fs.close();
 }

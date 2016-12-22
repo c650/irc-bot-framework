@@ -39,6 +39,9 @@ namespace IRC {
 		~Server();
 
 		bool start_connect();
+
+		void log_on(const std::string& nick, const std::string& pass) const;
+
 		void disconnect(const std::string& msg = "Leaving");
 
 		void join_channel(const std::string& chan);
@@ -63,7 +66,6 @@ namespace IRC {
 			       && this->port == other.port && this->address == other.address;
 		}
 
-		void log_on(const std::string& nick, const std::string& pass) const;
 
 	private:
 
