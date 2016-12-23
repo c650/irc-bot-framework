@@ -2429,7 +2429,62 @@ class basic_json
 
     @complexity Constant.
 
-    @exceptionsafety No-throw guarantee: this member function never throws
+    @exceptionsafety N14:04 -!- JSchmoe [root@85815546.AF6B30DB.EBE52B6F.IP] has joined #0x00sec
+14:13 !irc.0x00sec.org oaktree invited pinetree into the channel.
+14:13 -!- pinetree [pinetree@76266E2D.8DCDC6E5.CFA5164D.IP] has joined #0x00sec
+14:13 <@oaktree> Alright
+14:14 <@oaktree> @google 0x00sec Community
+14:14 < pinetree> pry0cc (pry0cc) · GitHub->https://github.com/pry0cc
+14:14 < pinetree> PsoC4 Interfacing with DS3231 (RTC) | Cypress Semiconductor->http://www.cypress.com/forum/psoc-4-architecture/psoc4-interfacing-ds3231-rtc
+14:14 < JSchmoe> @google oaktree
+14:14 < pinetree> Oaktree Capital->https://www.oaktreecapital.com/
+14:14 < pinetree> Oaktree | Oaktree->http://www.oaktree.org/
+14:14 <@oaktree> Ta freaking da
+14:14 < JSchmoe> I don't know what this does but nice
+14:14 <@oaktree> Im limiting to 2 results lol
+14:14 <@oaktree> It searches google!
+14:15 <@oaktree> i could do some pretty complex stuff with it i guess....
+14:15 < JSchmoe> @google how to join ISIS
+14:15 < pinetree> Here's What ISIS Recruits Ask Before Joining Up for Jihad - Defense ...->http://www.defenseone.com/threats/2014/11/heres-what-isis-recruits-ask-joining-jihad/98963/
+14:15 < pinetree> Google's Clever Plan to Stop Aspiring ISIS Recruits | WIRED->https://www.wired.com/2016/09/googles-clever-plan-stop-aspiring-isis-recruits/
+14:15 < JSchmoe> @google how to assasinate trump
+14:15 < pinetree> Why isn't the assassination attempt on Donald Trump bigger news ...->https://www.washingtonpost.com/news/the-fix/wp/2016/06/21/why-isnt-the-assassination-attempt-on-donald-trump-bigger-news/
+14:15 < pinetree> Facebook Refuses to Remove "Assassinate Donald Trump" Page ...->http://www.infowars.com/facebook-refuses-to-remove-assassinate-donald-trump-page/
+14:15 < JSchmoe> @google where to buy guns illegally
+14:15 < pinetree> Buying a gun on Facebook takes 15 minutes | VentureBeat | Media ...->http://venturebeat.com/2014/02/26/exclusive-buying-a-gun-on-facebook-takes-15-minutes/
+14:15 < pinetree> Inside Straw Purchasing: How Criminals Get Guns Illegally->https://everytownresearch.org/reports/inside-straw-purchasing-criminals-get-guns-illegally/
+14:15 < JSchmoe> @google how to win s hootout with cops
+14:15 < pinetree> Police Shootout with Old Man Guess Who Wins? Texas Shootout ...->https://www.youtube.com/watch?v=qpmp13ePolI
+14:15 < pinetree> Chelsea bomb suspect caught after shootout with cops | New York ...->http://nypost.com/2016/09/19/chelsea-bomb-suspect-caught-after-shootout-with-cops/
+14:16 < JSchmoe> @google how to make a bomb at home
+14:16 < pinetree> How To Make A PEN BOMB - EASY - YouTube->https://www.youtube.com/watch?v=g-r6KSKnNsA
+14:16 < pinetree> 3 Easy Ways to Make a Bottle Bomb (with Pictures) - wikiHow->http://www.wikihow.com/Make-a-Bottle-Bomb
+14:16 < JSchmoe> @google how to hide a body
+14:16 < pinetree> What is the best place to hide a dead body? - Quora->https://www.quora.com/What-is-the-best-place-to-hide-a-dead-body
+14:16 < pinetree> Disposal of human corpses - Wikipedia->https://en.wikipedia.org/wiki/Disposal_of_human_corpses
+14:16 < JSchmoe> nice wikipedia article there
+14:16 <@oaktree> @quit
+14:16 -!- pinetree [pinetree@76266E2D.8DCDC6E5.CFA5164D.IP] has quit [Quit: Quitting...]
+14:17 < JSchmoe> @google :/
+14:17 < JSchmoe> was gonna make some more queries
+14:17 <@oaktree> JSchmoe: god dammit
+14:18 <@oaktree> i had to register an api key...
+14:18 < JSchmoe> with your real name?
+14:18 < JSchmoe> oh shit
+14:18 <@oaktree> google dev account
+14:18 <@oaktree> thanks alot
+14:19 < JSchmoe> let me know when you get men in black knocking at your door
+14:20 <@oaktree> ill just show them the damn logs
+14:21 <@oaktree> im adding you to the ignore list :)
+14:21 <@oaktree> whenever i implement that feature, that is...
+14:21  * JSchmoe changes nick
+14:21 <@oaktree> yeah i can implement nick tracking too :P
+14:22  * JSchmoe changes ident
+14:22 <@oaktree> up next is a url shortener, in C++
+14:23 < JSchmoe> @shorten google.com/q=where+to+buy+a+slave
+14:24 <@oaktree> yeah sorry bud
+14:24 <@oaktree> im not bringing it online for a while ...
+o-throw guarantee: this member function never throws
     exceptions.
 
     @liveexample{The following code exemplifies `is_number_float()` for all

@@ -65,7 +65,7 @@ int main(void) {
 			packet.reply(res);
 		}
 
-	}, "returns a valid google search query link");
+	}, "returns first two results of a google search", REQUIRES_ADMIN_PERMS); // people have/will abuse this search... I can feel it.
 
 	b.on_privmsg("@babble", [](const IRC::Packet& packet){
 		packet.reply(get_a_babble());
