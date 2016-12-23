@@ -19,3 +19,7 @@ In this code above, "\@sayhi" is the trigger.
 The lambda function is what gets run upon a triggering. The lambda function __must__ take a single parameter, a `const IRC::Packet&` type. Using this `Packet&`, a user can easily `reply()` to the message (a PRIVMSG is sent to the same channel/person from which the original message came).
 
 The third parameter to `on_privmsg` is a description of the command. There is a fourth, optional parameter that specifies whether or not the command needs administrative privileges to run. This defaults to `false`.
+
+---
+
+I have added a few commands as an example, but they needn't say if you don't want them to.
