@@ -3,3 +3,5 @@
 *.o
 
 customize/*
+bin/
+google_search_api_info.json

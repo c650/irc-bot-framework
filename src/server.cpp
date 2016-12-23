@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-#include "./packet.hpp"
+#include "./include/packet.hpp"
 
 namespace IRC {
 
@@ -64,7 +64,7 @@ namespace IRC {
 	}
 
 	void Server::disconnect(const std::string& msg) {
-		_send("\rQUIT :Quit: " + msg + "\r\n");
+		_send("\rQUIT :" + msg + "\r\n");
 		sleep(5);
 		close(connection_socket_fd);
 		connection_socket_fd = -1;
@@ -142,13 +142,21 @@ namespace IRC {
 		return write( this->connection_socket_fd , msg.data() , msg.length() );
 	}
 
-	void Server::log_on(const std::string& nick, const std::string& pass) const {
-		this->_send("\rUSER " + nick + " 0 * :" + nick + "\r\n");
-		this->_send("\rNICK " + nick + "\r\n");
+	void Server::log_on(const std::string& n, const std::string& p) {
 
-		if (!pass.empty()) {
-			this->_send("\rPRIVMSG NickServ :identify " + pass + "\r\n");
+		this->nick = n;
+		this->_send("\rUSER " + this->nick + " 0 * :" + this->nick + "\r\n");
+		this->_send("\rNICK " + this->nick + "\r\n");
+
+		this->pass = p;
+		if (!this->pass.empty()) {
+			this->_send("\rPRIVMSG NickServ :identify " + this->pass + "\r\n");
 		}
+	}
+
+	void Server::set_nick(const std::string& new_nick) {
+		this->nick = new_nick;
+		this->_send("\rNICK " + this->nick + "\r\n");
 	}
 
 

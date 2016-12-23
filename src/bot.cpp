@@ -1,6 +1,6 @@
-#include "./bot.hpp"
-#include "./packet.hpp"
-#include "./server.hpp"
+#include "./include/bot.hpp"
+#include "./include/packet.hpp"
+#include "./include/server.hpp"
 
 namespace IRC {
 

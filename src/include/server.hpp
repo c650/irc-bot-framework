@@ -24,11 +24,14 @@ namespace IRC {
 
 	class Server {
 
-		std::string name;
-		std::string address;
-		int port;
+		std::string name,
+		            address;
+		int         port;
 
-		int connection_socket_fd;
+		int         connection_socket_fd;
+
+		std::string nick,
+		            pass;
 
 		std::vector< std::string > channels;
 
@@ -40,7 +43,7 @@ namespace IRC {
 
 		bool start_connect();
 
-		void log_on(const std::string& nick, const std::string& pass) const;
+		void log_on(const std::string& nick, const std::string& pass);
 
 		void disconnect(const std::string& msg = "Leaving");
 
@@ -56,6 +59,12 @@ namespace IRC {
 		unsigned int get_port() const {
 			return port;
 		}
+
+		std::string get_nick(void) const {
+			return nick;
+		}
+
+		void set_nick(const std::string& new_nick);
 
 		Packet receive();
 		void privmsg(const std::string& chan, const std::string& msg) const;

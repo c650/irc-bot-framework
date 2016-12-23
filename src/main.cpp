@@ -1,5 +1,8 @@
-#include "./bot.hpp"
-#include "./packet.hpp"
+#include "./include/json.hpp" // from https://github.com/nlohmann/json
+#include "./include/googler.hpp"
+
+#include "./include/bot.hpp"
+#include "./include/packet.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -34,14 +37,34 @@ int main(void) {
 		packet.reply("Hello!");
 	}, "says hello");
 
+	b.on_privmsg("@speak ", [](const IRC::Packet& packet){
+
+		std::string arguments = packet.content.substr(7); // everything after "@speak "
+
+		size_t first_space_idx = arguments.find(" ");
+		if (first_space_idx == std::string::npos)
+			return;
+		std::string chan = arguments.substr(0, first_space_idx);
+		std::string msg = arguments.substr(first_space_idx	+ 1);
+
+		packet.owner->privmsg( chan , msg );
+
+	}, "says something on some chan. usage: @speak #chan msg...", REQUIRES_ADMIN_PERMS);
+
 	b.on_privmsg("@slap ", [](const IRC::Packet& packet){
 		packet.reply("\001ACTION slapped the hell outta " + packet.content.substr(6) + "\001");
 	}, "slaps argument");
 
 	b.on_privmsg("@google ", [](const IRC::Packet& packet){
-		std::string link = "https://google.com/search?q=";
-		format_query( packet.content.substr(8) , link );
-		packet.reply("Does this work? " + link);
+		std::string query = "";
+		format_query( packet.content.substr(8) , query );
+
+		std::vector<std::string> res_vec;
+		Googler::do_google_search(query, 2, res_vec);
+		for (auto& res : res_vec) {
+			packet.reply(res);
+		}
+
 	}, "returns a valid google search query link");
 
 	b.on_privmsg("@babble", [](const IRC::Packet& packet){
@@ -53,7 +76,7 @@ int main(void) {
 	}, "kicks specified user.", REQUIRES_ADMIN_PERMS);
 
 	b.on_privmsg("@join ", [](const IRC::Packet& packet){
-		packet.owner->join_channel( packet.content.substr(6 , packet.content.find(" ")) );
+		packet.owner->join_channel( packet.content.substr(6 , packet.content.find(" ", 6) - 6) );
 	}, "joins specified channel.", REQUIRES_ADMIN_PERMS);
 
 	b.on_privmsg("@part ", [](const IRC::Packet& packet){
@@ -100,7 +123,8 @@ void format_query(const std::string& query_str, std::string& result) {
 		curl_free(escaped);
 	}
 
-	result.pop_back(); // remove last '+';
+	if (!result.empty())
+		result.pop_back(); // remove last '+';
 
 	free(query_str_char_ptr);
 	curl_easy_cleanup(curl);

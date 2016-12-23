@@ -3,8 +3,8 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "./packet.hpp"
-#include "./server.hpp"
+#include "./include/packet.hpp"
+#include "./include/server.hpp"
 
 namespace IRC {
 
