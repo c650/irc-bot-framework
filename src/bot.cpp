@@ -48,6 +48,15 @@ namespace IRC {
 		return true;
 	}
 
+	void Bot::add_a(const Bot::RELATIONSHIP& r , const std::string& user) {
+		switch(r) {
+		case RELATIONSHIP::ADMIN:
+			admins.push_back(user);
+		case RELATIONSHIP::IGNORED:
+			ignored.push_back(user);
+		}
+	}
+
 	void Bot::listen() {
 		bool got_resp = false; /* checks if at least one server gives resp. */
 		do {
@@ -70,8 +79,21 @@ namespace IRC {
 	/* helpers */
 
 	void Bot::_check_for_triggers(const Packet& p) {
-		if (p.type == "PRIVMSG") {
-			bool sender_is_admin = _is_admin(p.sender);
+
+		bool sender_is_admin = _is_admin(p.sender);
+
+		if (p.type == "NICK") {
+
+			// update admins and ignored based on nick changes.
+			for (auto& s : admins)
+				if (s == p.sender)
+					s = p.content;
+
+			for (auto& i : ignored)
+				if (i == p.sender)
+					i = p.content;
+
+		} else if (p.type == "PRIVMSG") {
 			if (p.content.substr(0, 5) == "@help") {
 				for (Command* command : this->commands) {
 					if (sender_is_admin || !command->requires_admin)
@@ -85,6 +107,10 @@ namespace IRC {
 					break;
 				}
 			}
+		} else if (p.type == "INVITE" && sender_is_admin) {
+			p.owner->join_channel( p.content );
+		} else if (p.type == "KICK") {
+			p.owner->join_channel( p.channel );
 		}
 	}
 

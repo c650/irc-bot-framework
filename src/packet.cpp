@@ -38,6 +38,9 @@ namespace IRC {
 		if (this->type == "JOIN" || this->type == "PART") {
 			this->channel = strtok(nullptr, "\0") + (this->type == "JOIN" ? 1 : 0);
 			return true;
+		} else if (this->type == "NICK") {
+			this->content = strtok(nullptr, "\0") + 1; // +1 for :
+			return true;
 		}
 
 		this->channel = strtok(nullptr, " ");

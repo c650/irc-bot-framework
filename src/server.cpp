@@ -25,7 +25,6 @@ namespace IRC {
 		this->disconnect();
 	}
 
-
 	bool Server::start_connect() {
 
 		std::cout << "Attempting to connect server: " << name << " at " << address << '\n';
@@ -109,18 +108,6 @@ namespace IRC {
 
 		Packet p(buf);
 
-		// add auto-rejoin here.
-		// add invite here...
-		if (p.type == "INVITE") {
-
-			join_channel( p.content );
-
-		} else if (p.type == "KICK") {
-
-			join_channel( p.channel );
-
-		}
-
 		delete[] buf;
 
 		return p;
@@ -158,6 +145,5 @@ namespace IRC {
 		this->nick = new_nick;
 		this->_send("\rNICK " + this->nick + "\r\n");
 	}
-
 
 };

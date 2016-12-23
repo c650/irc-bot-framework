@@ -16,6 +16,11 @@ namespace IRC {
 
 	class Bot {
 
+		enum class RELATIONSHIP {
+			ADMIN,
+			IGNORED
+		};
+
 		struct Command {
 			std::string trigger, desc;
 			std::function<void(const Packet&)> func;
@@ -48,6 +53,8 @@ namespace IRC {
 
 		bool join_channel(const std::string& server_name , const std::string& channel_name);
 		bool join_channel(const std::vector<Server*>::iterator& it, const std::string& channel_name);
+
+		void add_a(const RELATIONSHIP& r , const std::string& user);
 
 		/*
 			on some trigger, use function f.
