@@ -1,0 +1,11 @@
+{
+	"google_searc" : {
+		"cx": "YOUR_CX_HERE",
+		"key": "YOUR_API_KEY",
+		"address": "https://www.googleapis.com/customsearch/v1?"
+	},
+
+	"tinyurl" : {
+		"apikey" : "YOUR_API_KEY"
+	}
+}

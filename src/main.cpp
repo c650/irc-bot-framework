@@ -1,4 +1,4 @@
-#include "./include/json.hpp" // from https://github.com/nlohmann/json
+#include "./include/json.hpp" /* from https://github.com/nlohmann/json */
 #include "./include/googler.hpp"
 
 #include "./include/bot.hpp"
@@ -13,6 +13,10 @@
 #include <random>
 
 #define REQUIRES_ADMIN_PERMS true
+
+#ifndef DEFAULT_CONFIG_PATH
+	#define DEFAULT_CONFIG_PATH "./config.json"
+#endif
 
 std::vector<std::string> babbles;
 std::minstd_rand random_number_gen;
@@ -60,7 +64,7 @@ int main(void) {
 		format_query( packet.content.substr(8) , query );
 
 		std::vector<std::string> res_vec;
-		Googler::do_google_search(query, 2, res_vec);
+		Googler::do_google_search(query, 2, res_vec, DEFAULT_CONFIG_PATH);
 		for (auto& res : res_vec) {
 			packet.reply(res);
 		}
