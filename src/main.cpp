@@ -21,7 +21,6 @@
 std::vector<std::string> babbles;
 std::minstd_rand random_number_gen;
 
-void format_query(const std::string& query_str, std::string& result);
 static void readlines(const std::string& filename, std::vector<std::string>& result);
 
 std::string get_a_babble() {
@@ -60,11 +59,11 @@ int main(void) {
 	}, "slaps argument");
 
 	b.on_privmsg("@google ", [](const IRC::Packet& packet){
-		std::string query = "";
-		format_query( packet.content.substr(8) , query );
 
 		std::vector<std::string> res_vec;
-		Googler::do_google_search(query, 2, res_vec, DEFAULT_CONFIG_PATH);
+
+		Googler::do_google_search(packet.content.substr(8), 2, res_vec, DEFAULT_CONFIG_PATH);
+
 		for (auto& res : res_vec) {
 			packet.reply(res);
 		}
@@ -101,37 +100,6 @@ int main(void) {
 
 
 	return 0;
-}
-
-void format_query(const std::string& query_str, std::string& result) {
-
-	CURL *curl = curl_easy_init();
-	if (curl == nullptr) {
-		return;
-	}
-
-	char *escaped;
-	char *query_str_char_ptr = strdup(query_str.data());
-	char *token = strtok(query_str_char_ptr, ",;?!-_ \n\r");
-
-	while (token != nullptr) {
-
-		escaped = curl_easy_escape(curl, token, strlen(token));
-
-		std::cout << escaped << '\n';
-
-		result.append(std::string(escaped) + '+');
-
-		token = strtok(nullptr, ",.:;?!-_ ");
-
-		curl_free(escaped);
-	}
-
-	if (!result.empty())
-		result.pop_back(); // remove last '+';
-
-	free(query_str_char_ptr);
-	curl_easy_cleanup(curl);
 }
 
 static void readlines(const std::string& filename, std::vector<std::string>& result) {

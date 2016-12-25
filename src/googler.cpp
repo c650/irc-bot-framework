@@ -2,41 +2,14 @@
 #include <fstream>
 #include <string>
 
-#include<curl/curl.h>
-
 #include "./include/googler.hpp"
 #include "./include/json.hpp"
 #include "./include/url-shortener.hpp" /* shortening urls */
+#include "./include/http.hpp"
 
 namespace Googler {
 
-	void get_json_from_web(const std::string& url , nlohmann::json& json_obj) {
-
-		CURL *curl = curl_easy_init();
-		if (curl) {
-
-			curl_easy_setopt(curl, CURLOPT_URL, url.data());
-
-			std::string response;
-			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
-
-			CURLcode res = curl_easy_perform(curl);
-			if (res == CURLE_OK) {
-				json_obj = nlohmann::json::parse(response);
-			}
-			curl_easy_cleanup(curl);
-		}
-	}
-
-	size_t write_to_string(void *ptr, size_t size, size_t nmemb, std::string& stream) {
-		size_t realsize = size * nmemb;
-		std::string temp(static_cast<const char*>(ptr), realsize);
-		stream.append(temp);
-		return realsize;
-	}
-
-	void do_google_search(const std::string& formatted_query,
+	void do_google_search(const std::string& query,
 	                      const size_t& num_res_to_show,
 						  std::vector<std::string>& res_vec,
 						  const std::string& config_path)
@@ -52,19 +25,21 @@ namespace Googler {
 			return;
 		}
 
-		nlohmann::json search_result;
-		get_json_from_web(api_info["address"].get<std::string>()
-							+ "key=" + api_info["key"].get<std::string>()
-							+ "&cx=" + api_info["cx"].get<std::string>()
-							+ "&q=" + formatted_query, search_result);
+		std::string response;
+		MyHTTP::get(api_info["address"].get<std::string>()
+					+ "key=" + api_info["key"].get<std::string>()
+					+ "&cx=" + api_info["cx"].get<std::string>()
+					+ "&q=" + MyHTTP::uri_encode(query), response);
+		nlohmann::json search_result = nlohmann::json::parse(response);
 
 		size_t count = search_result["items"].size() > num_res_to_show ? num_res_to_show : search_result["items"].size();
-		for (auto& item : search_result["items"]) {
 
-			res_vec.push_back( item["title"].get<std::string>() + "->"  + ShortenURL::get_shortened_url(item["link"].get<std::string>(), config_path) );
+		nlohmann::json item;
+		for (size_t i = 0; i < count; ++i) {
+			item = search_result["items"].at(i);
 
-			if (!(--count))
-				break;
+			res_vec.push_back( item["title"].get<std::string>() + "->"
+			                   + ShortenURL::get_shortened_url(item["link"].get<std::string>(), config_path));
 		}
 	}
 };
