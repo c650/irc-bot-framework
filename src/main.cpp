@@ -18,19 +18,9 @@
 	#define DEFAULT_CONFIG_PATH "./config.json"
 #endif
 
-std::vector<std::string> babbles;
-std::minstd_rand random_number_gen;
-
-static void readlines(const std::string& filename, std::vector<std::string>& result);
-
-std::string get_a_babble() {
-	return babbles.empty() ? std::string("No Babbles atm.") : babbles.at(random_number_gen() % babbles.size());
-}
-
 int main(void) {
 
-	random_number_gen.seed(getpid());
-	readlines("./customize/techno_babble.txt", babbles);
+	Babbler babbler("./customize/techno_babble.txt");
 
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
 	IRC::Bot b("pinetree", "hi", "oaktree");
@@ -71,7 +61,7 @@ int main(void) {
 	}, "returns first two results of a google search", REQUIRES_ADMIN_PERMS); // people have/will abuse this search... I can feel it.
 
 	b.on_privmsg("@babble", [](const IRC::Packet& packet){
-		packet.reply(get_a_babble());
+		packet.reply( babbler.sample() );
 	}, "produces random technobabble");
 
 	b.on_privmsg("@kick ", [](const IRC::Packet& packet){
@@ -100,14 +90,4 @@ int main(void) {
 
 
 	return 0;
-}
-
-static void readlines(const std::string& filename, std::vector<std::string>& result) {
-	std::fstream fs(filename, std::fstream::in);
-
-	std::string tmp;
-	while(std::getline(fs, tmp))
-		result.push_back(tmp);
-
-	fs.close();
 }

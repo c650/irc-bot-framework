@@ -19,6 +19,7 @@ namespace Googler {
 		try {
 			std::fstream fs( config_path , std::fstream::in);
 			fs >> api_info;
+			fs.close();
 			api_info = api_info["google_search"]; // ignore other API info
 		} catch (...) {
 			std::cerr << "File IO failed in Googler. Couldn't retrieve API Key.\n";

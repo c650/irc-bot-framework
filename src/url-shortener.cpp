@@ -18,6 +18,7 @@ namespace ShortenURL {
 		try {
 			std::fstream fs ( config_path, std::fstream::in);
 			fs >> api_info;
+			fs.close();
 			api_info = api_info["tinyurl"];
 		} catch (...) {
 			std::cerr << "File IO failed in ShortenURL. Couldn't retrieve API Key.\n";
