@@ -1,5 +1,6 @@
 #include "./include/json.hpp" /* from https://github.com/nlohmann/json */
 #include "./include/googler.hpp"
+#include "./include/babbler.hpp"
 
 #include "./include/bot.hpp"
 #include "./include/packet.hpp"
@@ -18,9 +19,9 @@
 	#define DEFAULT_CONFIG_PATH "./config.json"
 #endif
 
-int main(void) {
+Babbler babbler("./customize/techno_babble.txt");
 
-	Babbler babbler("./customize/techno_babble.txt");
+int main(void) {
 
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
 	IRC::Bot b("pinetree", "hi", "oaktree");

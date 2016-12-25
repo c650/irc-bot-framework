@@ -10,6 +10,8 @@ class Babbler {
 	std::vector<std::string> babbles;
 	std::minstd_rand random_number_gen;
 
+public:
+
 	Babbler(const std::string& path_to_babble_file);
 
 	std::string sample(void);
