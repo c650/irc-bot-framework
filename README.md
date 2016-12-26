@@ -22,4 +22,4 @@ The third parameter to `on_privmsg` is a description of the command. There is a 
 
 ---
 
-I have added a few commands as an example, but they needn't say if you don't want them to.
+I have added a few commands as an example, but they needn't stay if you don't want them to.
