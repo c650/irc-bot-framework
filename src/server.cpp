@@ -93,6 +93,9 @@ namespace IRC {
 	}
 
 	Packet Server::receive() {
+		if (connection_socket_fd < 0) {
+			throw std::runtime_error("The connection to " + this->name + " was closed.");
+		}
 		char *buf = new char[4096];
 		for (int i = 0; i < 4096; ++i)
 			buf[i] = 0x00;

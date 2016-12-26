@@ -75,7 +75,6 @@ namespace IRC {
 			       && this->port == other.port && this->address == other.address;
 		}
 
-
 	private:
 
 		unsigned int _send(const std::string& msg) const;

@@ -64,8 +64,16 @@ namespace IRC {
 
 			Packet p;
 			for (Server* s : servers) {
-				p = s->receive();
+
+				try {
+					p = s->receive();
+				} catch (std::exception& e) {
+					std::cerr << e.what() << '\n';
+					continue;
+				}
+
 				p.owner = s;
+
 				if (p.is_valid()) {
 					this->_check_for_triggers(p);
 					got_resp = true;
