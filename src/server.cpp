@@ -31,20 +31,12 @@ namespace IRC {
 
 	bool Server::start_connect() {
 		std::cout << "Attempting to connect server: " << name << " at " << connection->get_address() << '\n';
-
-		/*  Polymorphism: It's hard to type, but it gets the job done. You'll see this pattern a few times
-		 	throughout this file.
-		*/
-		if (static_cast<SSLWrapper::SSLConnection*>(this->connection))
-			return static_cast<SSLWrapper::SSLConnection*>(this->connection)->do_connect();
 		return this->connection->do_connect();
 	}
 
 	void Server::disconnect(const std::string& msg) {
 		_send("\rQUIT :" + msg + "\r\n");
 		sleep(5);
-		if (static_cast<SSLWrapper::SSLConnection*>(this->connection))
-			return static_cast<SSLWrapper::SSLConnection*>(this->connection)->disconnect();
 		this->connection->disconnect();
 	}
 
@@ -73,9 +65,7 @@ namespace IRC {
 
 	Packet Server::receive() {
 
-		std::string s = static_cast<SSLWrapper::SSLConnection*>(this->connection) == nullptr ?
-		                    this->connection->receive()
-						  : static_cast<SSLWrapper::SSLConnection*>(this->connection)->receive();
+		std::string s = this->connection->receive();
 		if (s.substr(0,4) == "PING") {
 			s.replace(0,2, "\rPO");
 			_send(s);
@@ -96,9 +86,7 @@ namespace IRC {
 	/* helpers */
 	unsigned int Server::_send(const std::string& msg) const {
 		std::cout << "Sending: " << msg;
-		return static_cast<SSLWrapper::SSLConnection*>(this->connection) == nullptr ?
-		                    this->connection->send(msg)
-						  : static_cast<SSLWrapper::SSLConnection*>(this->connection)->send(msg);
+    	return this->connection->send(msg);
 	}
 
 	void Server::log_on(const std::string& n, const std::string& p) {
