@@ -20,15 +20,15 @@
 #include "./server.hpp"
 #include "./packet.hpp"
 
+#include "./ssl_connection.hpp"
+
 namespace IRC {
 
 	class Server {
 
-		std::string name,
-		            address;
-		int         port;
+		std::string name;
 
-		int         connection_socket_fd;
+		SSLWrapper::BaseConnection *connection;
 
 		std::string nick,
 		            pass;
@@ -37,7 +37,7 @@ namespace IRC {
 
 	public:
 
-		Server( const std::string& n, const std::string& a , const unsigned int& port );
+		Server( const std::string& n, const std::string& a , const int& port, bool with_ssl = true );
 
 		~Server();
 
@@ -53,13 +53,6 @@ namespace IRC {
 		std::string get_name() const {
 			return name;
 		}
-		std::string get_address() const {
-			return address;
-		}
-		unsigned int get_port() const {
-			return port;
-		}
-
 		std::string get_nick(void) const {
 			return nick;
 		}
@@ -71,8 +64,7 @@ namespace IRC {
 		void kick(const std::string& chan, const std::string& user) const;
 
 		bool operator==(Server& other) const {
-			return this->name == other.name && this->connection_socket_fd == other.connection_socket_fd
-			       && this->port == other.port && this->address == other.address;
+			return (this == &other) || (this->name == other.name && this->connection->socket_fd() == other.connection->socket_fd());
 		}
 
 	private:

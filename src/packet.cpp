@@ -1,7 +1,6 @@
 #include <string>
 #include <cstdio>
 #include <cstdlib>
-#include <cstring>
 
 #include "./include/packet.hpp"
 #include "./include/server.hpp"
@@ -13,9 +12,9 @@ namespace IRC {
 			this->owner->privmsg(this->channel, msg);
 	}
 
-	bool Packet::_parse(char *buf) {
+	bool Packet::_parse(std::string buf) {
 
-		if (strstr(buf, "!") == nullptr || strstr(buf, "@") == nullptr) {
+		if (buf.find("!") == std::string::npos || buf.find("@") == std::string::npos) {
 			content = buf;
 			return false;
 		}
@@ -23,31 +22,44 @@ namespace IRC {
 		std::cout << "Analyzing : " << buf;
 
 		/* Get rid of \r\n */
-		int n = strlen(buf);
-		buf[n-1] = buf[n-2] = '\0';
+		buf.pop_back();
+		buf.pop_back();
 
-		this->sender = strtok(buf, "!")+1; // gets user between : and !
+		size_t found = buf.find("!");
+		this->sender = buf.substr(1, found - 1); // gets user between : and !
+		buf = buf.erase(0, found+1);
 
-		this->realname = strtok(nullptr, "@"); // skip over ~
+		found = buf.find("@");
+		this->realname = buf.substr(0, found); // skip over ~
 		if (!this->realname.empty() && this->realname.front() == '~')
 			this->realname.erase(this->realname.begin());
+		buf = buf.erase(0, found+1);
 
-		this->hostname = strtok(nullptr, " ");
+		found = buf.find(" ");
+		this->hostname = buf.substr(0, found);
+		buf = buf.erase(0, found+1);
 
-		this->type = strtok(nullptr, " ");
+		found = buf.find(" ");
+		this->type = buf.substr(0, found);
+		buf = buf.erase(0, found+1);
+
 		if (this->type == "JOIN" || this->type == "PART") {
-			this->channel = strtok(nullptr, "\0") + (this->type == "JOIN" ? 1 : 0);
+			this->channel = buf.substr(this->type == "JOIN" ? 1 : 0);
 			return true;
 		} else if (this->type == "NICK") {
-			this->content = strtok(nullptr, "\0") + 1; // +1 for :
+			this->content = buf.substr(1); // +1 for :
 			return true;
 		}
 
-		this->channel = strtok(nullptr, " ");
-		if (channel.front() != '#')
-			channel = sender;
 
-		this->content = strtok(nullptr, "\0");
+		found = buf.find(" ");
+		this->channel = buf.substr(0, found);
+		buf = buf.erase(0, found+1);
+
+		if (this->channel.front() != '#')
+			this->channel = sender;
+
+		this->content = buf;
 
 		if ( !this->content.empty() && ( this->type == "PRIVMSG" || this->type == "NOTICE"))
 			this->content.erase(this->content.begin());
@@ -56,6 +68,12 @@ namespace IRC {
 			this->channel.erase(this->channel.begin()); // skip : in NICK messages
 
 		std::cout << "\tPacket successfully analyzed.\n";
+		std::cout << "\tsender: " << this->sender
+		          << "\n\trealname: " << this->realname
+				  << "\n\thostname: " << this->hostname
+				  << "\n\ttype: " << this->type
+				  << "\n\tchannel: " << this->channel
+				  << "\n\tcontent: " << this->content << '\n';
 		return true;
 	}
 

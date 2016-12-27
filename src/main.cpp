@@ -19,12 +19,16 @@
 	#define DEFAULT_CONFIG_PATH "./config.json"
 #endif
 
+#ifndef WITH_SSL
+	#define WITH_SSL true
+#endif
+
 Babbler babbler("./customize/techno_babble.txt");
 
 int main(void) {
 
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
-	IRC::Bot b("pinetree", "hi", "oaktree");
+	IRC::Bot b("pinetree", "", "oaktree");
 
 	/* And here are some actions/commands you can do! */
 	b.on_privmsg("@sayhi", [](const IRC::Packet& packet){
@@ -83,7 +87,8 @@ int main(void) {
 
 
 	/* Add a server and connect to it by name */
-	b.add_server("test","irc.0x00sec.org" , 6667);
+	/* SSL is used by default. To disable it, pass `false` in place of WITH_SSL */
+	b.add_server("test","irc.0x00sec.org" , 6697, WITH_SSL);
 	b.connect_server("test");
 
 	/* Listen on the server(s) for input! */
