@@ -42,7 +42,7 @@ namespace IRC {
 			IGNORED
 		};
 
-		Bot(const std::string& n, const std::string& pass, const std::string& first_admin);
+		Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins);
 		~Bot();
 
 		void add_server(std::string n , const std::string& a , const int& port, bool with_ssl = true);

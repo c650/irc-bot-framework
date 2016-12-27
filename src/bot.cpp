@@ -4,10 +4,11 @@
 
 namespace IRC {
 
-	Bot::Bot(const std::string& n, const std::string& pass, const std::string& first_admin)
+	Bot::Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins)
 		: nick(n) , password(pass)
 	{
-		admins.push_back(first_admin);
+		for (auto& a : _admins)
+			admins.push_back(a);
 	}
 
 	Bot::~Bot() {

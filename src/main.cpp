@@ -36,7 +36,9 @@ int main(void) {
 
 
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
-	IRC::Bot b(environment["bot"]["nick"].get<std::string>(), environment["bot"]["pass"].get<std::string>() , environment["bot"]["admins"].at(0).get<std::string>());
+	IRC::Bot b(environment["bot"]["nick"].get<std::string>(), /* Nickname */
+	           environment["bot"]["pass"].get<std::string>(), /* Password, can be "" */
+			   environment["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
 
 	/* And here are some actions/commands you can do! */
 	b.on_privmsg("@sayhi", [](const IRC::Packet& packet){
@@ -75,7 +77,7 @@ int main(void) {
 
 	b.on_privmsg("@babble", [](const IRC::Packet& packet){
 		packet.reply( babbler.sample() );
-	}, "produces random technobabble");
+	}, "produces random technobabble", REQUIRES_ADMIN_PERMS);
 
 	b.on_privmsg("@iplookup ", [](const IRC::Packet& packet){
 
