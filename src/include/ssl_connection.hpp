@@ -12,6 +12,10 @@
 
 #include "./plain_connection.hpp"
 
+/*
+	If you're reading this, get ready for headaches. This is OpenSSL stuff.
+*/
+
 namespace SSLWrapper {
 
 	class SSLConnection : public PlainConnection {
@@ -53,8 +57,9 @@ namespace SSLWrapper {
 			return true;
 		}
 
+		/* since copy-constructors are deleted, symmetry is the only measure of equality. */
 		bool operator==(SSLConnection& other) const {
-			return false;
+			return this == &other;
 		}
 
 	};
