@@ -14,6 +14,9 @@ namespace MyHTTP {
 
 	/* see .hpp for docs */
 	bool get(const std::string& url, std::string& response) {
+
+		std::cout << "MyHTTP::get( " << url << " )\n";
+
 		CURL *curl = curl_easy_init();
 		CURLcode res = CURLE_OK;
 		if (curl) {

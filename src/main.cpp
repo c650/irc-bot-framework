@@ -1,3 +1,5 @@
+#include "./include/environment.hpp"
+
 #include "./include/json.hpp" /* from https://github.com/nlohmann/json */
 #include "./include/googler.hpp"
 #include "./include/babbler.hpp"
@@ -16,18 +18,19 @@
 
 #define REQUIRES_ADMIN_PERMS true
 
-#ifndef DEFAULT_CONFIG_PATH
-	#define DEFAULT_CONFIG_PATH "./config.json"
-#endif
+#define DEFAULT_CONFIG_PATH "./config.json"
+
 
 Babbler babbler("./customize/techno_babble.txt");
 
+nlohmann::json ENVIRONMENT; /* Global Environment Variable. */
+
 int main(void) {
 
-	nlohmann::json environment;
+	/* Load the environment */
 	try {
 		std::fstream fs(DEFAULT_CONFIG_PATH, std::fstream::in);
-		fs >> environment;
+		fs >> ENVIRONMENT;
 		fs.close();
 	} catch(...) {
 		std::cerr << "Couldn't open " << DEFAULT_CONFIG_PATH << '\n';
@@ -36,9 +39,11 @@ int main(void) {
 
 
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
-	IRC::Bot b(environment["bot"]["nick"].get<std::string>(), /* Nickname */
-	           environment["bot"]["pass"].get<std::string>(), /* Password, can be "" */
-			   environment["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
+	IRC::Bot b(ENVIRONMENT["bot"]["nick"].get<std::string>(), /* Nickname */
+	           ENVIRONMENT["bot"]["pass"].get<std::string>(), /* Password, can be "" */
+			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
+
+
 
 	/* And here are some actions/commands you can do! */
 	b.on_privmsg("@sayhi", [](const IRC::Packet& packet){
@@ -67,7 +72,7 @@ int main(void) {
 
 		std::vector<std::string> res_vec;
 
-		Googler::do_google_search(packet.content.substr(8), 2, res_vec, DEFAULT_CONFIG_PATH);
+		Googler::do_google_search(packet.content.substr(8), 2, res_vec);
 
 		for (auto& res : res_vec) {
 			packet.reply(res);
@@ -104,7 +109,7 @@ int main(void) {
 
 	/* Add a server and connect to it by name */
 	/* SSL is used by default. To disable it, pass `false` in place of the with_ssl arg. */
-	for (auto& server : environment["servers"]) {
+	for (auto& server : ENVIRONMENT["servers"]) {
 		b.add_server( server["name"].get<std::string>(), server["address"].get<std::string>() , server["port"].get<int>(), server["with_ssl"].get<bool>());
 		b.connect_server( server["name"].get<std::string>() );
 	}
