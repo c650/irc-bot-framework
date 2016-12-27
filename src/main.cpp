@@ -19,16 +19,23 @@
 	#define DEFAULT_CONFIG_PATH "./config.json"
 #endif
 
-#ifndef WITH_SSL
-	#define WITH_SSL true
-#endif
-
 Babbler babbler("./customize/techno_babble.txt");
 
 int main(void) {
 
+	nlohmann::json environment;
+	try {
+		std::fstream fs(DEFAULT_CONFIG_PATH, std::fstream::in);
+		fs >> environment;
+		fs.close();
+	} catch(...) {
+		std::cerr << "Couldn't open " << DEFAULT_CONFIG_PATH << '\n';
+		return 1;
+	}
+
+
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
-	IRC::Bot b("pinetree", "", "oaktree");
+	IRC::Bot b(environment["bot"]["nick"].get<std::string>(), environment["bot"]["pass"].get<std::string>() , environment["bot"]["admins"].at(0).get<std::string>());
 
 	/* And here are some actions/commands you can do! */
 	b.on_privmsg("@sayhi", [](const IRC::Packet& packet){
@@ -87,9 +94,11 @@ int main(void) {
 
 
 	/* Add a server and connect to it by name */
-	/* SSL is used by default. To disable it, pass `false` in place of WITH_SSL */
-	b.add_server("test","irc.0x00sec.org" , 6697, WITH_SSL);
-	b.connect_server("test");
+	/* SSL is used by default. To disable it, pass `false` in place of the with_ssl arg. */
+	for (auto& server : environment["servers"]) {
+		b.add_server( server["name"].get<std::string>(), server["address"].get<std::string>() , server["port"].get<int>(), server["with_ssl"].get<bool>());
+		b.connect_server( server["name"].get<std::string>() );
+	}
 
 	/* Listen on the server(s) for input! */
 	b.listen();

@@ -22,7 +22,11 @@ namespace IRC {
 		}
 	}
 
-	void Bot::add_server(const std::string& n , const std::string& a , const int& port, bool with_ssl) {
+	void Bot::add_server(std::string n , const std::string& a , const int& port, bool with_ssl) {
+		for (const Server* s : servers) {
+			if (s->get_name() == n)
+				n.append("_");
+		}
 		servers.push_back( new Server(n , a , port, with_ssl) );
 	}
 

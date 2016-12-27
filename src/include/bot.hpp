@@ -16,11 +16,6 @@ namespace IRC {
 
 	class Bot {
 
-		enum class RELATIONSHIP {
-			ADMIN,
-			IGNORED
-		};
-
 		struct Command {
 			std::string trigger, desc;
 			std::function<void(const Packet&)> func;
@@ -42,10 +37,15 @@ namespace IRC {
 
 	public:
 
+		enum class RELATIONSHIP {
+			ADMIN,
+			IGNORED
+		};
+
 		Bot(const std::string& n, const std::string& pass, const std::string& first_admin);
 		~Bot();
 
-		void add_server(const std::string& n , const std::string& a , const int& port, bool with_ssl = true);
+		void add_server(std::string n , const std::string& a , const int& port, bool with_ssl = true);
 		void connect_server(const std::string& server_name);
 		void connect_server(const std::vector<Server*>::iterator& it);
 

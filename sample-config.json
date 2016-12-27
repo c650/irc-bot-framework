@@ -1,4 +1,20 @@
 {
+	"bot" : {
+		"nick":"bot",
+		"pass":"",
+		"admins": [
+			"YOU"
+		]
+	},
+
+	"servers" : {
+		"Freenode" : {
+			"address" : "irc.freenode.net",
+			"port" : 6667,
+			"with_ssl": false
+		}
+	},
+
 	"google_search" : {
 		"cx": "YOUR_CX_HERE",
 		"key": "YOUR_API_KEY",
