@@ -2,10 +2,11 @@
 #define _PLAIN_CONNECTION_H
 
 #include <string>
+#include "./base_connection.hpp"
 
 namespace SSLWrapper {
 
-	class PlainConnection {
+	class PlainConnection : public BaseConnection {
 
 	protected:
 		int connection_socket_fd,
@@ -17,9 +18,6 @@ namespace SSLWrapper {
 
 		PlainConnection(const std::string& _address, const int& port);
 		~PlainConnection();
-
-		PlainConnection(PlainConnection& other) = delete;
-		PlainConnection& operator=(PlainConnection& other) = delete;
 
 		bool do_connect(void);
 		void disconnect(void);
@@ -39,14 +37,14 @@ namespace SSLWrapper {
 			return false;
 		}
 
-		int socket_fd() const {
+		int socket_fd(void) const {
 			return connection_socket_fd;
 		}
 
-		std::string get_address() const {
+		std::string get_address(void) const {
 			return address;
 		}
-		int get_port() const {
+		int get_port(void) const {
 			return port;
 		}
 

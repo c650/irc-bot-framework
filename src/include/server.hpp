@@ -28,7 +28,7 @@ namespace IRC {
 
 		std::string name;
 
-		SSLWrapper::SSLConnection *connection;
+		SSLWrapper::BaseConnection *connection;
 
 		std::string nick,
 		            pass;
@@ -37,7 +37,7 @@ namespace IRC {
 
 	public:
 
-		Server( const std::string& n, const std::string& a , const int& port, bool with_ssl = false );
+		Server( const std::string& n, const std::string& a , const int& port, bool with_ssl = true );
 
 		~Server();
 

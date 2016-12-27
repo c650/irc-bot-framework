@@ -87,7 +87,8 @@ int main(void) {
 
 
 	/* Add a server and connect to it by name */
-	b.add_server("test","irc.0x00sec.org" , 6697);
+	/* SSL is used by default. To disable it, pass `false` in place of WITH_SSL */
+	b.add_server("test","irc.0x00sec.org" , 6697, WITH_SSL);
 	b.connect_server("test");
 
 	/* Listen on the server(s) for input! */
