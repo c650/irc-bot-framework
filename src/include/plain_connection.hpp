@@ -22,10 +22,10 @@ namespace SSLWrapper {
 		PlainConnection& operator=(PlainConnection& other) = delete;
 
 		bool do_connect(void);
-		bool disconnect(void);
+		void disconnect(void);
 
 		bool is_connected(void) {
-			return socket_fd > 0;
+			return connection_socket_fd > 0;
 		};
 
 		std::string receive(void);
@@ -34,6 +34,22 @@ namespace SSLWrapper {
 		bool is_secure(void) {
 			return false;
 		}
+
+		bool operator==(PlainConnection& other) const {
+			return false;
+		}
+
+		int socket_fd() const {
+			return connection_socket_fd;
+		}
+
+		std::string get_address() const {
+			return address;
+		}
+		int get_port() const {
+			return port;
+		}
+
 
 	};
 

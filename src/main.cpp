@@ -24,7 +24,7 @@ Babbler babbler("./customize/techno_babble.txt");
 int main(void) {
 
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
-	IRC::Bot b("pinetree", "hi", "oaktree");
+	IRC::Bot b("pinetree", "", "oaktree");
 
 	/* And here are some actions/commands you can do! */
 	b.on_privmsg("@sayhi", [](const IRC::Packet& packet){
@@ -83,7 +83,7 @@ int main(void) {
 
 
 	/* Add a server and connect to it by name */
-	b.add_server("test","irc.0x00sec.org" , 6667);
+	b.add_server("test","irc.0x00sec.org" , 6697);
 	b.connect_server("test");
 
 	/* Listen on the server(s) for input! */

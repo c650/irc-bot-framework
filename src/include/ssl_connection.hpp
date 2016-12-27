@@ -8,12 +8,13 @@
 #include <string>
 
 #include <openssl/ssl.h>
+#include <openssl/err.h>
 
 #include "./plain_connection.hpp"
 
 namespace SSLWrapper {
 
-	class SSLConnection : protected PlainConnection {
+	class SSLConnection : public PlainConnection {
 
 		class _ssl_init_object {
 		  public:
@@ -22,13 +23,13 @@ namespace SSLWrapper {
 				SSL_library_init();
 			}
 			~_ssl_init_object() {
-				ERR_remove_state(0);
+				ERR_remove_thread_state(nullptr);
 				ERR_free_strings();
 				EVP_cleanup();
 				CRYPTO_cleanup_all_ex_data();
 				sk_SSL_COMP_free(SSL_COMP_get_compression_methods());
 			}
-		}
+		};
 
 		SSL_CTX *ssl_context;
 		SSL     *ssl_handle;
@@ -45,11 +46,15 @@ namespace SSLWrapper {
 		int send(const std::string& msg);
 
 		bool is_connected(void) {
-			return connection.is_connected();
+			return PlainConnection::is_connected();
 		}
 
 		bool is_secure(void) {
 			return true;
+		}
+
+		bool operator==(SSLConnection& other) const {
+			return false;
 		}
 
 	};

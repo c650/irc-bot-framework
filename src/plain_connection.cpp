@@ -1,8 +1,10 @@
+#include "./include/plain_connection.hpp"
+
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
 
-#include <string>
+#include <iostream>
 #include <string>
 
 #include <arpa/inet.h>
@@ -22,8 +24,6 @@ namespace SSLWrapper {
 	}
 
 	bool PlainConnection::do_connect(void) {
-		std::cout << "Attempting to connect server: " << name << " at " << address << '\n';
-
 		struct sockaddr_in serv_addr;
 		struct hostent *server;
 
@@ -74,6 +74,7 @@ namespace SSLWrapper {
 			buf[i] = 0x00;
 		if (read(this->connection_socket_fd, buf, 4095) > 0) {
 			s = buf;
+			std::cout << s << '\n';
 		}
 
 		delete [] buf;

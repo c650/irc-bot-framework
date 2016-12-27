@@ -14,11 +14,12 @@
 #include <iostream>
 
 #include "./include/packet.hpp"
+#include "./include/ssl_connection.hpp"
 
 namespace IRC {
 
 	Server::Server( const std::string& n, const std::string& a , const int& p )
-		: name(n), connection(new SSLConnection(a , p) )
+		: name(n), connection(new SSLWrapper::SSLConnection(a , p) )
 		{}
 
 	Server::~Server() {
@@ -27,6 +28,7 @@ namespace IRC {
 	}
 
 	bool Server::start_connect() {
+		std::cout << "Attempting to connect server: " << name << " at " << connection->get_address() << '\n';
 		return connection->do_connect();
 	}
 
@@ -62,6 +64,10 @@ namespace IRC {
 	Packet Server::receive() {
 
 		std::string s = this->connection->receive();
+		if (s.substr(0,4) == "PING") {
+			s.replace(0,2, "\rPO");
+			_send(s);
+		}
 		Packet p(s);
 
 		return p;

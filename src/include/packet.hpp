@@ -29,7 +29,7 @@ namespace IRC {
 
 		Packet() : valid(false), owner(nullptr) {}
 
-		Packet(char *buf) : owner(nullptr) {
+		Packet(std::string buf) : owner(nullptr) {
 			valid = _parse(buf);
 		}
 
@@ -43,7 +43,7 @@ namespace IRC {
 
 	private:
 
-		bool _parse(char *buf);
+		bool _parse(std::string buf);
 	};
 }
 
