@@ -9,6 +9,7 @@
 
 	"servers" : {
 		"Freenode" : {
+			"name" : "Freenode",
 			"address" : "irc.freenode.net",
 			"port" : 6667,
 			"with_ssl": false
