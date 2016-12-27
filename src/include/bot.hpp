@@ -45,7 +45,7 @@ namespace IRC {
 		Bot(const std::string& n, const std::string& pass, const std::string& first_admin);
 		~Bot();
 
-		void add_server(const std::string& n , const std::string& a , const unsigned int& port);
+		void add_server(const std::string& n , const std::string& a , const int& port);
 		void connect_server(const std::string& server_name);
 		void connect_server(const std::vector<Server*>::iterator& it);
 

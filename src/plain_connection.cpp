@@ -17,7 +17,10 @@
 namespace SSLWrapper {
 
 	PlainConnection::PlainConnection(const std::string& _address, const int& _port)
-		: address(_address), port(_port), connection_socket_fd(-1) {}
+		: address(_address), port(_port), connection_socket_fd(-1)
+		{
+			std::cout << "PlainConnection(...)\n";
+		}
 
 	PlainConnection::~PlainConnection() {
 		this->disconnect();

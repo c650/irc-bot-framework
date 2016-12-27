@@ -19,6 +19,10 @@
 	#define DEFAULT_CONFIG_PATH "./config.json"
 #endif
 
+#ifndef WITH_SSL
+	#define WITH_SSL true
+#endif
+
 Babbler babbler("./customize/techno_babble.txt");
 
 int main(void) {

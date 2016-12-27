@@ -18,9 +18,11 @@
 
 namespace IRC {
 
-	Server::Server( const std::string& n, const std::string& a , const int& p )
-		: name(n), connection(new SSLWrapper::SSLConnection(a , p) )
-		{}
+	Server::Server( const std::string& n, const std::string& a , const int& p , bool with_ssl)
+		: name(n), connection( new SSLWrapper::SSLConnection(a , p) )
+		{
+			std::cout << "Server " << n << " with" << (with_ssl ? "" : "out") << " SSL\n";
+		}
 
 	Server::~Server() {
 		this->disconnect();

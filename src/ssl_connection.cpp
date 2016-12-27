@@ -12,7 +12,9 @@ namespace SSLWrapper {
 
 	SSLConnection::SSLConnection(const std::string& _address, const int& _port)
 		: PlainConnection(_address,_port), ssl_context(nullptr), ssl_handle(nullptr)
-		{}
+		{
+			std::cout << "SSLConnection(...)\n";
+		}
 
 	SSLConnection::~SSLConnection() {
 		this->disconnect();

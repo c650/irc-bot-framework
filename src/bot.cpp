@@ -22,8 +22,8 @@ namespace IRC {
 		}
 	}
 
-	void Bot::add_server(const std::string& n , const std::string& a , const unsigned int& port) {
-		servers.push_back( new Server(n,a,port) );
+	void Bot::add_server(const std::string& n , const std::string& a , const int& port) {
+		servers.push_back( new Server(n , a , port) );
 	}
 
 	void Bot::connect_server(const std::string& server_name) {

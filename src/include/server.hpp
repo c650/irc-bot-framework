@@ -37,7 +37,7 @@ namespace IRC {
 
 	public:
 
-		Server( const std::string& n, const std::string& a , const int& port );
+		Server( const std::string& n, const std::string& a , const int& port, bool with_ssl = false );
 
 		~Server();
 
