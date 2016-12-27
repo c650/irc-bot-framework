@@ -1,6 +1,7 @@
 #include "./include/json.hpp" /* from https://github.com/nlohmann/json */
 #include "./include/googler.hpp"
 #include "./include/babbler.hpp"
+#include "./include/iplookup.hpp"
 
 #include "./include/bot.hpp"
 #include "./include/packet.hpp"
@@ -75,6 +76,12 @@ int main(void) {
 	b.on_privmsg("@babble", [](const IRC::Packet& packet){
 		packet.reply( babbler.sample() );
 	}, "produces random technobabble");
+
+	b.on_privmsg("@iplookup ", [](const IRC::Packet& packet){
+
+		packet.reply( IPLookup::do_lookup( packet.content.substr( 10 ) ) );
+
+	}, "looks up a specified IP.", REQUIRES_ADMIN_PERMS);
 
 	b.on_privmsg("@kick ", [](const IRC::Packet& packet){
 		packet.owner->kick(packet.channel, packet.content.substr(6));
