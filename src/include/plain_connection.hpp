@@ -33,8 +33,9 @@ namespace SSLWrapper {
 			return false;
 		}
 
+		/* copying is deleted in BaseConnection, so equality is impossible except for symmetry.*/
 		bool operator==(PlainConnection& other) const {
-			return false;
+			return this == &other;
 		}
 
 		int socket_fd(void) const {
