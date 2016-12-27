@@ -17,56 +17,23 @@
 
 namespace IRC {
 
-	Server::Server( const std::string& n, const std::string& a , const unsigned int& p )
-		: name(n), address(a) , port( p ), connection_socket_fd(-1)
+	Server::Server( const std::string& n, const std::string& a , const int& p )
+		: name(n), connection(new SSLConnection(a , p) )
 		{}
 
 	Server::~Server() {
 		this->disconnect();
+		delete connection;
 	}
 
 	bool Server::start_connect() {
-
-		std::cout << "Attempting to connect server: " << name << " at " << address << '\n';
-
-		struct sockaddr_in serv_addr;
-		struct hostent *server;
-
-		this->connection_socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-		if (this->connection_socket_fd < 0) {
-			std::cerr << "Could not get a socket fd.\n";
-			return false;
-		}
-
-		server = gethostbyname(this->address.data());
-		if (server == nullptr) {
-			std::cerr << "Could not find host: " << this->address << '\n';
-			close(this->connection_socket_fd);
-			return false;
-		}
-
-		memset(&serv_addr, 0, sizeof(serv_addr));
-
-		memcpy(	(char*)&serv_addr.sin_addr.s_addr, (char*)server->h_addr, server->h_length );
-
-		serv_addr.sin_family = AF_INET;
-		serv_addr.sin_port = htons(this->port);
-
-		if ( connect(this->connection_socket_fd, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) < 0 ) {
-			std::cerr << "Error connecting to " << this->address << '\n';
-			close(this->connection_socket_fd);
-			return false;
-		};
-
-		std::cout << "Connection Success.\n";
-		return true;
+		return connection->do_connect();
 	}
 
 	void Server::disconnect(const std::string& msg) {
 		_send("\rQUIT :" + msg + "\r\n");
 		sleep(5);
-		close(connection_socket_fd);
-		connection_socket_fd = -1;
+		connection->disconnect();
 	}
 
 	void Server::join_channel(const std::string& chan) {
@@ -93,25 +60,9 @@ namespace IRC {
 	}
 
 	Packet Server::receive() {
-		if (connection_socket_fd < 0) {
-			throw std::runtime_error("The connection to " + this->name + " was closed.");
-		}
-		char *buf = new char[4096];
-		for (int i = 0; i < 4096; ++i)
-			buf[i] = 0x00;
 
-		int n = read(connection_socket_fd , buf , 4095);
-		std::cout << "Read " << n << " bytes\n";
-
-		std::string s = buf;
-		if (s.substr(0,4) == "PING") {
-			s.replace(0,2, "\rPO");
-			_send(s);
-		}
-
-		Packet p(buf);
-
-		delete[] buf;
+		std::string s = this->connection->receive();
+		Packet p(s);
 
 		return p;
 	}
@@ -126,10 +77,8 @@ namespace IRC {
 
 	/* helpers */
 	unsigned int Server::_send(const std::string& msg) const {
-		if (connection_socket_fd < 0) return 0;
-
 		std::cout << "Sending: " << msg;
-		return write( this->connection_socket_fd , msg.data() , msg.length() );
+		return this->connection->send(msg);
 	}
 
 	void Server::log_on(const std::string& n, const std::string& p) {

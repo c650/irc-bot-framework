@@ -24,11 +24,9 @@ namespace IRC {
 
 	class Server {
 
-		std::string name,
-		            address;
-		int         port;
+		std::string name;
 
-		int         connection_socket_fd;
+		SSLConnection *connection;
 
 		std::string nick,
 		            pass;
@@ -37,7 +35,7 @@ namespace IRC {
 
 	public:
 
-		Server( const std::string& n, const std::string& a , const unsigned int& port );
+		Server( const std::string& n, const std::string& a , const int& port );
 
 		~Server();
 
