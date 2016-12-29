@@ -35,6 +35,8 @@ namespace IRC {
 	}
 
 	void Server::disconnect(const std::string& msg) {
+		if (!this->connection->is_connected())
+			return;
 		_send("\rQUIT :" + msg + "\r\n");
 		sleep(5);
 		this->connection->disconnect();
