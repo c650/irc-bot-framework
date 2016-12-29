@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <stdexcept>
 
 #include <curl/curl.h>
 
@@ -15,11 +16,16 @@ namespace ShortenURL {
 
 		std::string response = "";
 
-		std::string url = "http://tiny-url.info/api/v1/create?provider=tinyurl_com&apikey="
-		                  + ENVIRONMENT["tinyurl"]["api_key"].get<std::string>()
-						  + "&url=" + MyHTTP::uri_encode(long_url);
+		try {
+			std::string url = "http://tiny-url.info/api/v1/create?provider=tinyurl_com&apikey="
+			                  + ENVIRONMENT["tinyurl"]["api_key"].get<std::string>()
+							  + "&url=" + MyHTTP::uri_encode(long_url);
 
-		MyHTTP::get(url, response);
+			MyHTTP::get(url, response);
+		} catch (std::exception& e) {
+			std::cerr << "Failed to shorten the URL " << long_url << " because: " << e.what() << '\n';
+			response = ""; // just in case.
+		}
 
 		return response;
 	}

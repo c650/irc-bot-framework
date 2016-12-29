@@ -12,7 +12,10 @@ class Babbler {
 
 public:
 
+	Babbler();
 	Babbler(const std::string& path_to_babble_file);
+
+	void load_file(const std::string& path_to_babble_file);
 
 	std::string sample(void);
 

@@ -20,8 +20,7 @@
 
 #define DEFAULT_CONFIG_PATH "./config.json"
 
-
-Babbler babbler("./customize/techno_babble.txt");
+Babbler babbler;
 
 nlohmann::json ENVIRONMENT; /* Global Environment Variable. */
 
@@ -42,8 +41,9 @@ int main(void) {
 	IRC::Bot b(ENVIRONMENT["bot"]["nick"].get<std::string>(), /* Nickname */
 	           ENVIRONMENT["bot"]["pass"].get<std::string>(), /* Password, can be "" */
 			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
+	// The program SHOULD crash if the above 3 lines don't work.
 
-
+	babbler.load_file(ENVIRONMENT["babble"]["filepath"]);
 
 	/* And here are some actions/commands you can do! */
 	b.on_privmsg("@sayhi", [](const IRC::Packet& packet){

@@ -9,10 +9,19 @@
 
 #include <unistd.h>
 
-Babbler::Babbler(const std::string& path_to_babble_file) {
-
+Babbler::Babbler() {
 	random_number_gen.seed(getpid());
+}
 
+Babbler::Babbler(const std::string& path_to_babble_file) : Babbler() {
+	this->load_file(path_to_babble_file);
+}
+
+std::string Babbler::sample(void) {
+	return babbles.empty() ? std::string("No babbles available.") : babbles.at( random_number_gen() % babbles.size() );
+}
+
+void Babbler::load_file(const std::string& path_to_babble_file) {
 	try {
 		std::fstream fs(path_to_babble_file, std::fstream::in);
 		std::string tmp;
@@ -22,8 +31,4 @@ Babbler::Babbler(const std::string& path_to_babble_file) {
 	} catch (...) {
 		std::cerr << "Error initializing Babbler with babbles.\n";
 	}
-}
-
-std::string Babbler::sample(void) {
-	return babbles.empty() ? std::string("No babbles available.") : babbles.at( random_number_gen() % babbles.size() );
 }
