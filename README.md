@@ -6,6 +6,16 @@ Anyone is free to customize it, add to it, or even contribute in making a better
 All of this code is licensed under the MIT License.
 
 ---
+# Building and Using
+
+Take a look at [sample-config.json](/sample-config.json) to see what you need to run all of the bot's features. The only necessary pieces of information for running the bot are the "bot" and "servers" sections.
+
+On Linux 64 bit machines:
+
+	./configure #still in Alpha
+	make
+	./bin/bot.out
+---
 # Design...
 
 I aim to provide a simple way to interface with other entities on IRC. Using the `on_privmsg` function, a user of this framework can add some extra functionality. The bot will listen for a trigger like ("\@something"). The trigger has to be the beginning of another user's IRC message.
