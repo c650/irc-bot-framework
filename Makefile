@@ -10,7 +10,10 @@ OUT = bin/bot.out
 build: ${SRC}
 	${CC} ${CFLAGS} -o ${OUT} ${SRC} ${LDFLAGS} ${LDLIBS}
 
-.PHONY: clean
+.PHONY: clean static
+
+# static: ${SRC}
+# 	${CC} -static ${CFLAGS} -o ${OUT}.static ${SRC} ${LDFLAGS} ${LDLIBS}
 
 clean:
 	rm ./bin/bot.out
