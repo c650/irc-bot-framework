@@ -1,25 +1,21 @@
-#include "./include/environment.hpp"
+#include "./Plugins/include/environment.hpp"
 
-#include "./include/json.hpp" /* from https://github.com/nlohmann/json */
-#include "./include/googler.hpp"
-#include "./include/random-line-stream.hpp"
-#include "./include/iplookup.hpp"
-#include "./include/sayhi.hpp"
-#include "./include/babbler.hpp"
-#include "./include/slap.hpp"
-#include "./include/speak.hpp"
-#include "./include/utility.hpp"
+#include "./Plugins/include/json.hpp" /* from https://github.com/nlohmann/json */
+#include "./Plugins/include/googler.hpp"
+#include "./Plugins/include/random-line-stream.hpp"
+#include "./Plugins/include/iplookup.hpp"
+#include "./Plugins/include/sayhi.hpp"
+#include "./Plugins/include/babbler.hpp"
+#include "./Plugins/include/slap.hpp"
+#include "./Plugins/include/speak.hpp"
+#include "./Plugins/include/utility.hpp"
 
-#include "../IRCBot/include/bot.hpp"
-#include "../IRCBot/include/packet.hpp"
-#include "../IRCBot/include/command-interface.hpp"
-
+#include "./IRCBot/include/bot.hpp"
+#include "./IRCBot/include/packet.hpp"
+#include "./IRCBot/include/command-interface.hpp"
 
 #include <iostream>
 #include <fstream>
-
-#include <unistd.h>
-#include <cstring>
 
 #define DEFAULT_CONFIG_PATH "./config.json"
 
