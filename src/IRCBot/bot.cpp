@@ -126,7 +126,7 @@ namespace IRC {
 		}
 
 		/* Here we go through the user-added Commands */
-		for (const auto command : this->commands) {                                      /* checks sender's perms.... */
+		for (auto command : this->commands) {                                      /* checks sender's perms.... */
 			if (command->triggered(p)) {
 				command->run(p);
 			}

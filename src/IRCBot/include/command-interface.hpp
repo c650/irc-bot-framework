@@ -28,9 +28,9 @@ namespace IRC {
 
 			@return whether the packet is triggering.
 		*/
-		virtual bool triggered(const Packet& p) const = 0;
+		virtual bool triggered(const Packet& p) = 0;
 
-		virtual void run(const Packet& p) const  = 0;
+		virtual void run(const Packet& p) = 0;
 
 		bool requires_admin(void) const {
 			return req_admin;

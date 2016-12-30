@@ -20,11 +20,11 @@ namespace IPLookup {
 
 		IPLookupCommand() : IRC::CommandInterface("@iplookup ", "looks up IP address.", true) {}
 
-		bool triggered(const IRC::Packet& p) const {
+		bool triggered(const IRC::Packet& p) {
 			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
 		}
 
-		void run(const IRC::Packet& p) const {
+		void run(const IRC::Packet& p) {
 			p.reply(do_lookup(p.content.substr(this->trigger().length())));
 		}
 	};

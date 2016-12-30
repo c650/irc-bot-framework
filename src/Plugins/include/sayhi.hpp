@@ -10,11 +10,11 @@ public:
 
 	SayHi() : IRC::CommandInterface("@sayhi", "says hi.") {}
 
-	bool triggered(const IRC::Packet& p) const {
+	bool triggered(const IRC::Packet& p) {
 		return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0, this->trigger().length()) == this->trigger();
 	}
 
-	void run(const IRC::Packet& p) const {
+	void run(const IRC::Packet& p) {
 		p.reply("Hello!");
 	}
 };

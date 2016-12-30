@@ -5,6 +5,7 @@
 #include "./include/random-line-stream.hpp"
 #include "./include/iplookup.hpp"
 #include "./include/sayhi.hpp"
+#include "./include/babbler.hpp"
 
 #include "../IRCBot/include/bot.hpp"
 #include "../IRCBot/include/packet.hpp"
@@ -45,6 +46,12 @@ int main(void) {
 	b.add_command( (IRC::CommandInterface*)(new SayHi) );
 	b.add_command( (IRC::CommandInterface*)(new Googler::GoogleCommand) );
 	b.add_command( (IRC::CommandInterface*)(new IPLookup::IPLookupCommand) );
+
+	try {
+		b.add_command( (IRC::CommandInterface*)(new Babbler( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );
+	} catch (...) {
+		std::cerr << "Failed to add Babbler\n";
+	}
 
 
 	/* Add a server and connect to it by name */

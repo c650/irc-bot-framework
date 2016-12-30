@@ -26,11 +26,11 @@ namespace Googler {
 	public:
 		GoogleCommand() : CommandInterface("@google ", "Performs google search and returns shortened links.", true) {}
 
-		bool triggered(const IRC::Packet& p) const {
+		bool triggered(const IRC::Packet& p) {
 			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
 		}
 
-		void run(const IRC::Packet& p) const {
+		void run(const IRC::Packet& p) {
 
 			std::vector<std::string> res_vec;
 
