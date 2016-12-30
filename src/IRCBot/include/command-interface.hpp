@@ -8,8 +8,6 @@
 
 class CommandInterface {
 
-	std::function<void(const Packet&)> func;
-
 	std::string trigger_string, description;
 
 	bool req_admin;
@@ -17,7 +15,7 @@ class CommandInterface {
 public:
 
 	CommandInterface(const std::string& ts, const std::string& d = "No Description Set.", bool ra = false)
-		: trigger_string(ts), description(d), func([](const Packet& p){return;}), requires_admin(ra) {}
+		: trigger_string(ts), description(d), requires_admin(ra) {}
 
 	/*
 		Inheritors will complete this function to
@@ -30,14 +28,7 @@ public:
 	*/
 	virtual bool triggered(const Packet& p) const = 0;
 
-	/*
-		Function can be overridden, but it defaults to calling func().
-
-		@param p the packet to be passed to func.
-	*/
-	virtual void run(const Packet& p) const {
-		func(p);
-	}
+	virtual void run(const Packet& p) const  = 0;
 
 	bool requires_admin(void) const {
 		return req_admin;
