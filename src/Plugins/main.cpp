@@ -6,6 +6,9 @@
 #include "./include/iplookup.hpp"
 #include "./include/sayhi.hpp"
 #include "./include/babbler.hpp"
+#include "./include/slap.hpp"
+#include "./include/speak.hpp"
+#include "./include/utility.hpp"
 
 #include "../IRCBot/include/bot.hpp"
 #include "../IRCBot/include/packet.hpp"
@@ -46,6 +49,9 @@ int main(void) {
 	b.add_command( (IRC::CommandInterface*)(new SayHi) );
 	b.add_command( (IRC::CommandInterface*)(new Googler::GoogleCommand) );
 	b.add_command( (IRC::CommandInterface*)(new IPLookup::IPLookupCommand) );
+	b.add_command( (IRC::CommandInterface*)(new Slap) );
+	b.add_command( (IRC::CommandInterface*)(new Speak) );
+	b.add_command( (IRC::CommandInterface*)(new Utility) );
 
 	try {
 		b.add_command( (IRC::CommandInterface*)(new Babbler( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );
