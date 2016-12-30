@@ -1,14 +1,7 @@
 #include "./Plugins/include/environment.hpp"
 
 #include "./Plugins/include/json.hpp" /* from https://github.com/nlohmann/json */
-#include "./Plugins/include/googler.hpp"
-#include "./Plugins/include/random-line-stream.hpp"
-#include "./Plugins/include/iplookup.hpp"
-#include "./Plugins/include/sayhi.hpp"
-#include "./Plugins/include/babbler.hpp"
-#include "./Plugins/include/slap.hpp"
-#include "./Plugins/include/speak.hpp"
-#include "./Plugins/include/utility.hpp"
+#include "./Plugins/include/plugins.hpp"
 
 #include "./IRCBot/include/bot.hpp"
 #include "./IRCBot/include/packet.hpp"
@@ -20,8 +13,6 @@
 #define DEFAULT_CONFIG_PATH "./config.json"
 
 nlohmann::json ENVIRONMENT; /* Global Environment Variable. */
-
-RandomLineStream babbler;
 
 int main(void) {
 
@@ -42,15 +33,15 @@ int main(void) {
 			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
 	// The program SHOULD crash if the above 3 lines don't work.
 
-	b.add_command( (IRC::CommandInterface*)(new SayHi) );
-	b.add_command( (IRC::CommandInterface*)(new Googler::GoogleCommand) );
-	b.add_command( (IRC::CommandInterface*)(new IPLookup::IPLookupCommand) );
-	b.add_command( (IRC::CommandInterface*)(new Slap) );
-	b.add_command( (IRC::CommandInterface*)(new Speak) );
-	b.add_command( (IRC::CommandInterface*)(new Utility) );
+	b.add_command( (IRC::CommandInterface*)(new Plugins::SayHiCommand) );
+	b.add_command( (IRC::CommandInterface*)(new Plugins::GoogleCommand) );
+	b.add_command( (IRC::CommandInterface*)(new Plugins::IPLookupCommand) );
+	b.add_command( (IRC::CommandInterface*)(new Plugins::SlapCommand) );
+	b.add_command( (IRC::CommandInterface*)(new Plugins::SpeakCommand) );
+	b.add_command( (IRC::CommandInterface*)(new Plugins::UtilityCommands) );
 
 	try {
-		b.add_command( (IRC::CommandInterface*)(new Babbler( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );
+		b.add_command( (IRC::CommandInterface*)(new Plugins::BabblerCommand( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );
 	} catch (...) {
 		std::cerr << "Failed to add Babbler\n";
 	}
