@@ -49,6 +49,7 @@ Use the following line to add the command to a bot:
     some_bot.add_command( (IRC::CommandInterface*)(new Thing) );
 
 To run the bot, information must be specified like it is in the [sample config](/sample-config.json).
+
 ---
 
 I have added a few commands as an example, but they needn't stay if you don't want them to.
