@@ -2,7 +2,7 @@
 
 #include "./include/json.hpp" /* from https://github.com/nlohmann/json */
 #include "./include/googler.hpp"
-#include "./include/babbler.hpp"
+#include "./include/random-line-stream.hpp"
 #include "./include/iplookup.hpp"
 
 #include "./include/bot.hpp"
@@ -20,9 +20,9 @@
 
 #define DEFAULT_CONFIG_PATH "./config.json"
 
-Babbler babbler;
-
 nlohmann::json ENVIRONMENT; /* Global Environment Variable. */
+
+RandomLineStream babbler;
 
 int main(void) {
 
@@ -43,7 +43,7 @@ int main(void) {
 			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
 	// The program SHOULD crash if the above 3 lines don't work.
 
-	babbler.load_file(ENVIRONMENT["babble"]["filepath"]);
+	babbler.load_file(ENVIRONMENT["babble"]["filepath"].get<std::string>());
 
 	/* And here are some actions/commands you can do! */
 	b.on_privmsg("@sayhi", [](const IRC::Packet& packet){
