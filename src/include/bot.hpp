@@ -9,21 +9,13 @@
 #include <algorithm>
 
 #include "./types.hpp"
+#include "./command-interface.hpp"
 #include "./server.hpp"
 #include "./packet.hpp"
 
 namespace IRC {
 
 	class Bot {
-
-		struct Command {
-			std::string trigger, desc;
-			std::function<void(const Packet&)> func;
-			bool requires_admin;
-
-			Command(const std::string& t , std::function<void(const Packet&)> f, const std::string& d, bool ra)
-				: trigger(t), func(f), desc(d), requires_admin(ra) {}
-		};
 
 		std::string nick;
 		std::string password;
@@ -33,7 +25,7 @@ namespace IRC {
 
 		std::vector< Server* > servers;
 
-		std::vector<Command*> commands;
+		std::vector<CommandInterface*> commands;
 
 	public:
 
@@ -113,6 +105,7 @@ namespace IRC {
 			f has to be:
 				void f(const Packet& p);
 
+			@param pt the type of packet as defined in include/packet.hpp
 			@param trigger the string to look for. The trigger must appear
 				at the beginning of the message being inspected for it to be a valid command.
 			@param f the function to call upon triggering the command.
@@ -121,18 +114,7 @@ namespace IRC {
 				therefore requires administrative rights to run.
 		*/
 		template <class Func>
-		void on_privmsg(const std::string& trigger, Func f, const std::string& desc, bool requires_admin = false);
-
-		/*
-			on_join, on_kick, and on_nick have not yet been implemented.
-		*/
-		// template <class Func>
-		// void on_join(Func f);
-		//
-		// template <class Func>
-		// void on_kick(Func f);
-
-		// void on_nick();
+		void on_packet(const Packet::PacketType& pt, const std::string& trigger, Func f, const std::string& desc, bool requires_admin = false);
 
 		/* Reads from all connected servers and responds accordingly if
 			a trigger is found.
@@ -173,8 +155,8 @@ namespace IRC {
 	};
 
 	template <class Func>
-	void Bot::on_privmsg(const std::string& trigger, Func f, const std::string& desc, bool requires_admin) {
-		commands.push_back( new Command(trigger, f , desc, requires_admin) );
+	void Bot::void on_packet(const Packet::PacketType& pt, const std::string& trigger, Func f, const std::string& desc, bool requires_admin) {
+		commands.push_back( new Command(pt, trigger, f , desc, requires_admin) );
 	}
 };
 #endif

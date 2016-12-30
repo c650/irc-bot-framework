@@ -11,13 +11,30 @@ namespace IRC {
 
 	struct Packet {
 
+		enum class PacketType {
+			PRIVMSG,
+			JOIN,
+			PART,
+			KICK,
+			INVITE,
+			LIST,
+			MODE,
+			NICK,
+			PING,
+			PONG,
+			QUIT,
+			WHO,
+			WHOIS,
+			WHOWAS,
+			OTHER
+		};
+
 		std::string sender,
 		            realname,
 					hostname,
-					type,
 					channel,
-
 					content;
+		PacketType type;
 
 		Server *owner;
 
@@ -71,6 +88,13 @@ namespace IRC {
 			@param buf the buffer to parse.
 		*/
 		bool _parse(std::string buf);
+
+		/*
+			Determines type from string
+
+			@param t the type as a string.
+		*/
+		PacketType _read_type(std::string& t);
 	};
 }
 
