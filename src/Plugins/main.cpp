@@ -44,6 +44,7 @@ int main(void) {
 
 	b.add_command( (IRC::CommandInterface*)(new SayHi) );
 	b.add_command( (IRC::CommandInterface*)(new Googler::GoogleCommand) );
+	b.add_command( (IRC::CommandInterface*)(new IPLookup::IPLookupCommand) );
 
 
 	/* Add a server and connect to it by name */
