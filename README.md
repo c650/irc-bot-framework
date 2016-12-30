@@ -8,27 +8,47 @@ All of this code is licensed under the MIT License.
 ---
 # Building and Using
 
-Take a look at [sample-config.json](/sample-config.json) to see what you need to run all of the bot's features. The only necessary pieces of information for running the bot are the "bot" and "servers" sections.
+The code in [src/IRCBot](/src/IRCBot) is what is needed to use this framework.
 
-On Linux 64 bit machines:
+To make a plugin/command/feature, you define a class that inherits from `CommandInterface`. This class has two important methods to be overridden:
+1. `triggered` determines whether a certain packet's content should trigger the command.
+2. `run` performs whatever action should happen when a packet triggers the command.
 
-	./configure #still in Alpha
-	make
-	./bin/bot.out
----
-# Design...
+It is best to define these new subclasses of `CommandInterface` in [src/Plugins/include](/src/Plugins/include) like so:
 
-I aim to provide a simple way to interface with other entities on IRC. Using the `on_privmsg` function, a user of this framework can add some extra functionality. The bot will listen for a trigger like ("\@something"). The trigger has to be the beginning of another user's IRC message.
+    #ifndef _NAME_OF_THING_H
+	#define _NAME_OF_THING_H
 
-	b.on_privmsg("\@sayhi", [](const IRC::Packet& packet){
-		packet.reply("Hello!");
-	}, "says hello");
+	#include "../../IRCBot/include/command-interface.hpp"
+	#include "../../IRCBot/include/packet.hpp"
 
-In this code above, "\@sayhi" is the trigger.
+	class Thing : public CommandInterface {
 
-The lambda function is what gets run upon a triggering. The lambda function __must__ take a single parameter, a `const IRC::Packet&` type. Using this `Packet&`, a user can easily `reply()` to the message (a PRIVMSG is sent to the same channel/person from which the original message came).
+	public:
 
-The third parameter to `on_privmsg` is a description of the command. There is a fourth, optional parameter that specifies whether or not the command needs administrative privileges to run. This defaults to `false`.
+		Thing() : CommandInterface("trigger as a string for help menu", "description", /* whether or not admin privs are needed. */) {}
+
+		/* Note that constructors may specify parameters as needed. */
+
+		bool triggered(const Packet& p) {
+			/* what triggers the command */
+		}
+
+		void run(const Packet& p) {
+			/* what to do when command is triggered */
+		}
+
+	}
+
+	#endif
+
+Once you define the class, include the header in [main.cpp](/src/main.cpp).
+
+Use the following line to add the command to a bot:
+
+    some_bot.add_command( (IRC::CommandInterface*)(new Thing) );
+
+To run the bot, information must be specified like it is in the [sample config](/sample-config.json).
 
 ---
 

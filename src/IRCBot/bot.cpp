@@ -17,7 +17,7 @@ namespace IRC {
 				delete s;
 		}
 
-		for (Command* c : commands) {
+		for (CommandInterface* c : commands) {
 			if (c)
 				delete c;
 		}
@@ -62,6 +62,10 @@ namespace IRC {
 		}
 	}
 
+	void Bot::add_command( CommandInterface* cmd ) {
+		commands.push_back(cmd);
+	}
+
 	void Bot::listen() {
 		bool got_resp = false; /* checks if at least one server gives resp. */
 		do {
@@ -95,7 +99,8 @@ namespace IRC {
 
 		bool sender_is_admin = _is_admin(p.sender);
 
-		if (p.type == "NICK") {
+		/* These are default commands, raw functionality, internal stuff... */
+		if (p.type == Packet::PacketType::NICK) {
 
 			// update admins and ignored based on nick changes.
 			for (auto& s : admins)
@@ -106,25 +111,27 @@ namespace IRC {
 				if (i == p.sender)
 					i = p.content;
 
-		} else if (p.type == "PRIVMSG") {
+		} else if (p.type == Packet::PacketType::PRIVMSG) {
 			if (p.content.substr(0, 5) == "@help") {
-				for (Command* command : this->commands) {
-					if (sender_is_admin || !command->requires_admin)
-						p.owner->privmsg(p.sender, command->trigger + ": " + command->desc);
+				for (const auto command : this->commands) {
+					if (sender_is_admin || !command->requires_admin())
+						p.owner->privmsg(p.sender, command->trigger() + ": " + command->desc());
 				}
 				return;
 			}
-			for (Command* command : this->commands) {                                      /* checks sender's perms.... */
-				if (p.content.substr(0 , command->trigger.length()) == command->trigger && ( !command->requires_admin || sender_is_admin )) {
-					command->func(p);
-					break;
-				}
-			}
-		} else if (p.type == "INVITE" && sender_is_admin) {
+		} else if (p.type == Packet::PacketType::INVITE && sender_is_admin) {
 			p.owner->join_channel( p.content );
-		} else if (p.type == "KICK") {
+		} else if (p.type == Packet::PacketType::KICK) {
 			p.owner->join_channel( p.channel );
 		}
+
+		/* Here we go through the user-added Commands */
+		for (auto command : this->commands) {                                      /* checks sender's perms.... */
+			if (command->triggered(p)) {
+				command->run(p);
+			}
+		}
+
 	}
 
 	std::vector<Server*>::iterator Bot::_find_server_by_name(const std::string& n) {

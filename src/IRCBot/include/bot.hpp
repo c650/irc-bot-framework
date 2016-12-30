@@ -9,21 +9,13 @@
 #include <algorithm>
 
 #include "./types.hpp"
+#include "./command-interface.hpp"
 #include "./server.hpp"
 #include "./packet.hpp"
 
 namespace IRC {
 
 	class Bot {
-
-		struct Command {
-			std::string trigger, desc;
-			std::function<void(const Packet&)> func;
-			bool requires_admin;
-
-			Command(const std::string& t , std::function<void(const Packet&)> f, const std::string& d, bool ra)
-				: trigger(t), func(f), desc(d), requires_admin(ra) {}
-		};
 
 		std::string nick;
 		std::string password;
@@ -33,7 +25,7 @@ namespace IRC {
 
 		std::vector< Server* > servers;
 
-		std::vector<Command*> commands;
+		std::vector<CommandInterface*> commands;
 
 	public:
 
@@ -108,31 +100,11 @@ namespace IRC {
 		void add_a(const RELATIONSHIP& r , const std::string& user);
 
 		/*
-			on some trigger, use function f.
+			Adds the CommandInterface cmd to the list of commands.
 
-			f has to be:
-				void f(const Packet& p);
-
-			@param trigger the string to look for. The trigger must appear
-				at the beginning of the message being inspected for it to be a valid command.
-			@param f the function to call upon triggering the command.
-			@param desc a description of the command. This is used in @help
-			@param requires_admin whether or not the command is privileged/sensitive and
-				therefore requires administrative rights to run.
+			@param cmd the command interface.
 		*/
-		template <class Func>
-		void on_privmsg(const std::string& trigger, Func f, const std::string& desc, bool requires_admin = false);
-
-		/*
-			on_join, on_kick, and on_nick have not yet been implemented.
-		*/
-		// template <class Func>
-		// void on_join(Func f);
-		//
-		// template <class Func>
-		// void on_kick(Func f);
-
-		// void on_nick();
+		void add_command( CommandInterface* cmd );
 
 		/* Reads from all connected servers and responds accordingly if
 			a trigger is found.
@@ -171,10 +143,5 @@ namespace IRC {
 		bool join_channel(const std::vector<Server*>::iterator& it, const std::string& channel_name);
 
 	};
-
-	template <class Func>
-	void Bot::on_privmsg(const std::string& trigger, Func f, const std::string& desc, bool requires_admin) {
-		commands.push_back( new Command(trigger, f , desc, requires_admin) );
-	}
 };
 #endif

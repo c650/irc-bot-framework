@@ -1,7 +1,8 @@
 #ifndef _IPLOOKUP_H
 #define _IPLOOKUP_H
 
-#include "./json.hpp"
+#include "../../IRCBot/include/command-interface.hpp"
+#include "../../IRCBot/include/packet.hpp"
 
 namespace IPLookup {
 

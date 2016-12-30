@@ -4,6 +4,9 @@
 #include <string>
 #include "./json.hpp"
 
+#include "../../IRCBot/include/command-interface.hpp"
+#include "../../IRCBot/include/packet.hpp"
+
 namespace Googler {
 
 	/*

@@ -4,7 +4,7 @@ CFLAGS= --std=c++17
 LDLIBS= -lcurl -lcrypto -lssl
 LDFLAGS= -L/usr/lib/x86_64-linux-gnu
 
-SRC = src/*.cpp
+SRC = src/IRCBot/*.cpp src/Plugins/*.cpp src/main.cpp
 OUT = bin/bot.out
 
 build: ${SRC}
