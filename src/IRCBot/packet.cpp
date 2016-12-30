@@ -40,7 +40,7 @@ namespace IRC {
 		buf = buf.erase(0, found+1);
 
 		found = buf.find(" ");
-		this->type = buf.substr(0, found);
+		this->type = _read_type(buf.substr(0, found));
 		buf = buf.erase(0, found+1);
 
 		if (this->type == PacketType::JOIN || this->type == PacketType::PART) {
@@ -71,9 +71,11 @@ namespace IRC {
 		std::cout << "\tsender: " << this->sender
 		          << "\n\trealname: " << this->realname
 				  << "\n\thostname: " << this->hostname
-				  << "\n\ttype: " << this->type
 				  << "\n\tchannel: " << this->channel
 				  << "\n\tcontent: " << this->content << '\n';
+
+				//   << "\n\ttype: " << this->type
+
 		return true;
 	}
 
@@ -91,7 +93,7 @@ namespace IRC {
 		vec.push_back(content.substr(last));
 	}
 
-	PacketType _read_type(std::string& t) {
+	Packet::PacketType Packet::_read_type(const std::string& t) {
 		if (t == "PRIVMSG")
 			return PacketType::PRIVMSG;
 		if (t == "JOIN")

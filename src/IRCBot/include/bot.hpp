@@ -100,21 +100,11 @@ namespace IRC {
 		void add_a(const RELATIONSHIP& r , const std::string& user);
 
 		/*
-			on some trigger, use function f.
+			Adds the CommandInterface cmd to the list of commands.
 
-			f has to be:
-				void f(const Packet& p);
-
-			@param pt the type of packet as defined in include/packet.hpp
-			@param trigger the string to look for. The trigger must appear
-				at the beginning of the message being inspected for it to be a valid command.
-			@param f the function to call upon triggering the command.
-			@param desc a description of the command. This is used in @help
-			@param requires_admin whether or not the command is privileged/sensitive and
-				therefore requires administrative rights to run.
+			@param cmd the command interface.
 		*/
-		template <class Func>
-		void on_packet(const Packet::PacketType& pt, const std::string& trigger, Func f, const std::string& desc, bool requires_admin = false);
+		void add_command( CommandInterface* cmd );
 
 		/* Reads from all connected servers and responds accordingly if
 			a trigger is found.
@@ -153,10 +143,5 @@ namespace IRC {
 		bool join_channel(const std::vector<Server*>::iterator& it, const std::string& channel_name);
 
 	};
-
-	template <class Func>
-	void Bot::void on_packet(const Packet::PacketType& pt, const std::string& trigger, Func f, const std::string& desc, bool requires_admin) {
-		commands.push_back( new Command(pt, trigger, f , desc, requires_admin) );
-	}
 };
 #endif

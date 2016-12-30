@@ -5,6 +5,7 @@ namespace IRC {
 	struct Packet;
 	class Server;
 	class Bot;
+	class CommandInterface;
 }
 
 #endif

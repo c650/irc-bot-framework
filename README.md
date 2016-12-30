@@ -8,28 +8,7 @@ All of this code is licensed under the MIT License.
 ---
 # Building and Using
 
-Take a look at [sample-config.json](/sample-config.json) to see what you need to run all of the bot's features. The only necessary pieces of information for running the bot are the "bot" and "servers" sections.
-
-On Linux 64 bit machines:
-
-	./configure #still in Alpha
-	make
-	./bin/bot.out
----
-# Design...
-
-I aim to provide a simple way to interface with other entities on IRC. Using the `on_privmsg` function, a user of this framework can add some extra functionality. The bot will listen for a trigger like ("\@something"). The trigger has to be the beginning of another user's IRC message.
-
-	b.on_privmsg("\@sayhi", [](const IRC::Packet& packet){
-		packet.reply("Hello!");
-	}, "says hello");
-
-In this code above, "\@sayhi" is the trigger.
-
-The lambda function is what gets run upon a triggering. The lambda function __must__ take a single parameter, a `const IRC::Packet&` type. Using this `Packet&`, a user can easily `reply()` to the message (a PRIVMSG is sent to the same channel/person from which the original message came).
-
-The third parameter to `on_privmsg` is a description of the command. There is a fourth, optional parameter that specifies whether or not the command needs administrative privileges to run. This defaults to `false`.
-
+The code in [src/IRCBot](/src/IRCBot) is what is needed to use this framework.
 ---
 
 I have added a few commands as an example, but they needn't stay if you don't want them to.

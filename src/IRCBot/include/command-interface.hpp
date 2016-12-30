@@ -1,48 +1,50 @@
 #ifndef _COMMAND_INTERFACE_H
 #define _COMMAND_INTERFACE_H
 
-#include "./packet.hpp"
+#include "./types.hpp"
 
 #include <functional>
 #include <string>
 
-class CommandInterface {
+namespace IRC {
 
-	std::string trigger_string, description;
+	class CommandInterface {
 
-	bool req_admin;
+		std::string trigger_string, description;
 
-public:
+		bool req_admin;
 
-	CommandInterface(const std::string& ts, const std::string& d = "No Description Set.", bool ra = false)
-		: trigger_string(ts), description(d), requires_admin(ra) {}
+	public:
 
-	/*
-		Inheritors will complete this function to
-		determine whether or not a certain packet
-		has the trigger for their command.
+		CommandInterface(const std::string& ts, const std::string& d = "No Description Set.", bool ra = false)
+			: trigger_string(ts), description(d), req_admin(ra) {}
 
-		@param p the packet to inspect.
+		/*
+			Inheritors will complete this function to
+			determine whether or not a certain packet
+			has the trigger for their command.
 
-		@return whether the packet is triggering.
-	*/
-	virtual bool triggered(const Packet& p) const = 0;
+			@param p the packet to inspect.
 
-	virtual void run(const Packet& p) const  = 0;
+			@return whether the packet is triggering.
+		*/
+		virtual bool triggered(const Packet& p) const = 0;
 
-	bool requires_admin(void) const {
-		return req_admin;
-	}
+		virtual void run(const Packet& p) const  = 0;
 
-	std::string trigger(void) const {
-		return trigger_string;
-	}
+		bool requires_admin(void) const {
+			return req_admin;
+		}
 
-	std::string desc(void) const {
-		return description;
-	}
+		std::string trigger(void) const {
+			return trigger_string;
+		}
 
-}
+		std::string desc(void) const {
+			return description;
+		}
 
+	};
+};
 
 #endif

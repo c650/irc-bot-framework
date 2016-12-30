@@ -26,6 +26,7 @@ namespace IRC {
 			WHO,
 			WHOIS,
 			WHOWAS,
+			NOTICE,
 			OTHER
 		};
 
@@ -94,7 +95,7 @@ namespace IRC {
 
 			@param t the type as a string.
 		*/
-		PacketType _read_type(std::string& t);
+		PacketType _read_type(const std::string& t);
 	};
 }
 

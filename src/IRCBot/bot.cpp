@@ -17,7 +17,7 @@ namespace IRC {
 				delete s;
 		}
 
-		for (CommandInterace* c : commands) {
+		for (CommandInterface* c : commands) {
 			if (c)
 				delete c;
 		}
@@ -60,6 +60,10 @@ namespace IRC {
 		case RELATIONSHIP::IGNORED:
 			ignored.push_back(user);
 		}
+	}
+
+	void Bot::add_command( CommandInterface* cmd ) {
+		commands.push_back(cmd);
 	}
 
 	void Bot::listen() {
@@ -123,8 +127,8 @@ namespace IRC {
 
 		/* Here we go through the user-added Commands */
 		for (const auto command : this->commands) {                                      /* checks sender's perms.... */
-			if (command->triggered()) {
-				command->run();
+			if (command->triggered(p)) {
+				command->run(p);
 			}
 		}
 

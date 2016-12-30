@@ -4,19 +4,18 @@
 #include "./include/googler.hpp"
 #include "./include/random-line-stream.hpp"
 #include "./include/iplookup.hpp"
+#include "./include/sayhi.hpp"
 
-#include "./include/bot.hpp"
-#include "./include/packet.hpp"
+#include "../IRCBot/include/bot.hpp"
+#include "../IRCBot/include/packet.hpp"
+#include "../IRCBot/include/command-interface.hpp"
+
 
 #include <iostream>
 #include <fstream>
 
 #include <unistd.h>
-#include <curl/curl.h>
 #include <cstring>
-#include <random>
-
-#define REQUIRES_ADMIN_PERMS true
 
 #define DEFAULT_CONFIG_PATH "./config.json"
 
@@ -43,7 +42,8 @@ int main(void) {
 			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
 	// The program SHOULD crash if the above 3 lines don't work.
 
-	b.add_command(  )
+	b.add_command( (IRC::CommandInterface*)(new SayHi) );
+	b.add_command( (IRC::CommandInterface*)(new Googler::GoogleCommand) );
 
 
 	/* Add a server and connect to it by name */
