@@ -14,15 +14,15 @@
 
 nlohmann::json ENVIRONMENT; /* Global Environment Variable. */
 
-int main(void) {
+int main(int argc, char **argv) {
 
 	/* Load the environment */
 	try {
-		std::fstream fs(DEFAULT_CONFIG_PATH, std::fstream::in);
+		std::fstream fs(argc > 1 ? argv[1] : DEFAULT_CONFIG_PATH, std::fstream::in);
 		fs >> ENVIRONMENT;
 		fs.close();
-	} catch(...) {
-		std::cerr << "Couldn't open " << DEFAULT_CONFIG_PATH << '\n';
+	} catch(std::exception& e) {
+		std::cerr << "Couldn't open " << DEFAULT_CONFIG_PATH << ": " << e.what() << '\n';
 		return 1;
 	}
 
