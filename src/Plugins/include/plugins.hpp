@@ -135,7 +135,7 @@ namespace Plugins {
 
 			if (p.content.length() > 5) {
 				if ( cmd == "@kick" ) {
-					p.owner->kick(p.channel, p.content.substr(6));p.owner->kick(p.channel, p.content.substr(6));
+					p.owner->kick(p.channel, p.content.substr(6));
 				} else if ( cmd == "@join" ) {
 					p.owner->join_channel( p.content.substr(6 , p.content.find(" ", 6) - 6) );
 				} else if ( cmd == "@part" ) {

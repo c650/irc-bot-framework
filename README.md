@@ -53,7 +53,7 @@ To run the bot, information must be specified like it is in the [sample config](
 ---
 # Compiling
 
-First, run `./configure`. If you aren't using a Debian-based linux, the dependencies are **libcurl** and **openSSL/libssl** and you must install them manually. If you intend to compile from source, the `*-dev` packages, as well as a C++ compiler, are also needed.
+First, run `./configure.sh`. If you aren't using a Debian-based linux, the dependencies are **libcurl** and **openSSL/libssl** and you must install them manually. If you intend to compile from source, the `*-dev` packages, as well as a C++ compiler, are also needed.
 
 A 64-bit linux binary is on the releases page. For any other architecture or OS, please do the following:
 
