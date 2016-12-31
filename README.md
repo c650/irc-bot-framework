@@ -3,8 +3,6 @@
 This framework is written entirely in C++. I wrote it because I felt like it.
 Anyone is free to customize it, add to it, or even contribute in making a better, cleaner (please) framework.
 
-All of this code is licensed under the MIT License.
-
 ---
 # Usage
 
