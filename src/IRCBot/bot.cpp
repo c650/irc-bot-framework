@@ -126,8 +126,8 @@ namespace IRC {
 		}
 
 		/* Here we go through the user-added Commands */
-		for (auto command : this->commands) {                                      /* checks sender's perms.... */
-			if (command->triggered(p)) {
+		for (auto command : this->commands) {    /* checks sender's perms.... */
+			if (command->triggered(p) && (sender_is_admin || !command->requires_admin())) {
 				command->run(p);
 			}
 		}
