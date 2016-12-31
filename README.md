@@ -6,7 +6,7 @@ Anyone is free to customize it, add to it, or even contribute in making a better
 All of this code is licensed under the MIT License.
 
 ---
-# Building and Using
+# Usage
 
 The code in [src/IRCBot](/src/IRCBot) is what is needed to use this framework.
 
@@ -51,6 +51,19 @@ Use the following line to add the command to a bot:
 To run the bot, information must be specified like it is in the [sample config](/sample-config.json).
 
 ---
+# Compiling
+
+First, run `./configure`. If you aren't using a Debian-based linux, the dependencies are **libcurl** and **openSSL/libssl** and you must install them manually. If you intend to compile from source, the `*-dev` packages, as well as a C++ compiler, are also needed.
+
+A 64-bit linux binary is on the releases page. For any other architecture or OS, please do the following:
+
+	mkdir bin
+	make
+	./bin/bot.out [optional argument with path to configuration file]
+
+**NOTE**: You may want to run the bot from inside a Docker container.
+
+---
 
 I have added a few commands as an example, but they needn't stay if you don't want them to.
 
@@ -58,3 +71,8 @@ I have added a few commands as an example, but they needn't stay if you don't wa
 # Acknowledgements
 
 Thanks to @nlohmann for his [C++ JSON Library](https://github.com/nlohmann/json).
+
+---
+# License
+
+This project is licensed under the [Three-Clause BSD License](/LICENSE).
