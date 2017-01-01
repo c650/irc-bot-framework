@@ -5,7 +5,7 @@
 namespace IRC {
 
 	Bot::Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins)
-		: nick(n) , password(pass)
+		: nick(n) , password(pass), start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0)
 	{
 		for (auto& a : _admins)
 			admins.push_back(a);
@@ -84,6 +84,7 @@ namespace IRC {
 				p.owner = s;
 
 				if (p.is_valid()) {
+					this->packets_received++;
 					this->_check_for_triggers(p);
 					got_resp = true;
 				}
@@ -118,6 +119,14 @@ namespace IRC {
 						p.owner->privmsg(p.sender, command->trigger() + ": " + command->desc());
 				}
 				return;
+			} else if (p.content.substr(0, 6) == "@stats" && sender_is_admin) {
+				for (const auto& s : this->get_stats()) {
+					p.owner->privmsg(p.sender , s);
+				}
+
+				for (const auto command : this->commands) {
+					p.owner->privmsg(p.sender, command->get_stats());
+				}
 			}
 		} else if (p.type == Packet::PacketType::INVITE && sender_is_admin) {
 			p.owner->join_channel( p.content );
@@ -129,6 +138,7 @@ namespace IRC {
 		for (auto command : this->commands) {    /* checks sender's perms.... */
 			if (command->triggered(p) && (sender_is_admin || !command->requires_admin())) {
 				command->run(p);
+				this->commands_executed++;
 			}
 		}
 
@@ -149,5 +159,14 @@ namespace IRC {
 				return true;
 		std::cout << person << " is not an admin.\n";
 		return false;
+	}
+
+	std::vector<std::string> Bot::get_stats(void) {
+		time_t t = std::chrono::system_clock::to_time_t(start_time);
+		return std::vector<std::string>{ "Up Since: " + std::string(std::ctime(&t)),
+				 "Packets Received: " + std::to_string(this->packets_received),
+				 "Packets Sent: " + std::to_string(this->packets_sent),
+				 "Commands Executed: " + std::to_string(this->commands_executed)
+			 };
 	}
 };

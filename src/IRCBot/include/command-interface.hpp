@@ -32,6 +32,10 @@ namespace IRC {
 
 		virtual void run(const Packet& p) = 0;
 
+		virtual std::string get_stats(void) {
+			return trigger_string + ": N/A";
+		}
+
 		bool requires_admin(void) const {
 			return req_admin;
 		}

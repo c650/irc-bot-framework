@@ -6,6 +6,9 @@
 #include <unordered_map>
 #include <functional>
 
+#include <chrono>
+#include <ctime>
+
 #include <algorithm>
 
 #include "./types.hpp"
@@ -26,6 +29,10 @@ namespace IRC {
 		std::vector< Server* > servers;
 
 		std::vector<CommandInterface*> commands;
+
+		/* For Stats: */
+		std::chrono::time_point<std::chrono::system_clock> start_time;
+		unsigned long long packets_received, packets_sent, commands_executed;
 
 	public:
 
@@ -141,6 +148,8 @@ namespace IRC {
 
 		void connect_server(const std::vector<Server*>::iterator& it);
 		bool join_channel(const std::vector<Server*>::iterator& it, const std::string& channel_name);
+
+		std::vector<std::string> get_stats(void);
 
 	};
 };

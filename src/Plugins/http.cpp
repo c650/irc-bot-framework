@@ -3,7 +3,7 @@
 #include <cstring>
 #include <stdexcept>
 
-#include "./json.hpp"
+#include "./include/json.hpp"
 
 namespace MyHTTP {
 
@@ -15,20 +15,17 @@ namespace MyHTTP {
 		return realsize;
 	}
 
-	static std::string _parse_params(const nlohmann::json& params) {
-		std::string p = "";
-
-		try {
-			for (auto& element : params) {
-				p.append(element.key().get<std::string>() + "=" + element.value().get<std::string>() + "&");
-			}
-			p.pop_back(); // remove last '&'
-		} catch (std::exception& e) {
-			std::cerr << "Failed to parse params: " << e.what() << '\n';
-			p = "";
-		}
-
-		return p;
+	static void _parse_params(const nlohmann::json& params, std::string& p) {
+		// try {
+		// 	for (auto element = params.begin(); element != params.end() ; ++element) {
+		// 		p.append((*element).key().get<std::string>() + "=" + (*element).value().get<std::string>() + "&");
+		// 	}
+		// 	p.pop_back(); // remove last '&'
+		// } catch (std::exception& e) {
+		// 	std::cerr << "Failed to parse params: " << e.what() << '\n';
+		// 	p = "";
+		// }
+		p="";
 	}
 
 	/* see .hpp for docs */

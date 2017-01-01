@@ -8,15 +8,17 @@ namespace Plugins {
 
 	class GoogleCommand : public IRC::CommandInterface {
 
+		unsigned long long times_executed;
+
 	  public:
-		GoogleCommand() : CommandInterface("@google ", "Performs google search and returns shortened links.", true) {}
+		GoogleCommand()
+			: CommandInterface("@google ", "Performs google search and returns shortened links.", true), times_executed(0) {}
 
 		bool triggered(const IRC::Packet& p) {
 			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
 		}
 
 		void run(const IRC::Packet& p) {
-
 			std::vector<std::string> res_vec;
 
 			Googler::do_google_search(p.content.substr(this->trigger().length()), 2, res_vec);
@@ -24,7 +26,11 @@ namespace Plugins {
 			for (auto& res : res_vec) {
 				p.reply(res);
 			}
+			this->times_executed++;
+		}
 
+		std::string get_stats(void) {
+			return "GoogleCommand -> Times Executed: " + std::to_string(this->times_executed);
 		}
 
 	};
