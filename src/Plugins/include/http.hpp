@@ -4,6 +4,8 @@
 #include <iostream>
 #include <curl/curl.h>
 
+#include "./json.hpp"
+
 namespace MyHTTP {
 
 	/*
@@ -16,6 +18,17 @@ namespace MyHTTP {
 		@return whether or not the response was a CURLE_OK.
 	*/
 	bool get(const std::string& url, std::string& response);
+
+
+	/*
+		Performs an HTTP POST
+
+		@param url the target for POST
+		@param params the post parameters to send.
+
+		@return if POST was successful.
+	*/
+	bool post(const std::string& url, const nlohmann::json& params);
 
 	/*
 		Encodes a string with URI compliance.
