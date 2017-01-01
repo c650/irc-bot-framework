@@ -3,6 +3,7 @@
 #include "./iplookup.hpp"
 #include "./googler.hpp"
 #include "./random-line-stream.hpp" /* for use in BabblerCommand */
+#include "./stocks.hpp"
 
 namespace Plugins {
 
@@ -120,6 +121,28 @@ namespace Plugins {
 
 		void run(const IRC::Packet& p) {
 			p.reply(rls.sample());
+		}
+
+	};
+
+	class StocksCommand : public IRC::CommandInterface {
+
+		unsigned long long queries_done;
+
+	public:
+
+		StocksCommand() : CommandInterface("@stock ", "checks a stock ticker price."), queries_done(0) {}
+
+		bool triggered(const IRC::Packet& p) {
+			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
+		}
+
+		void run(const IRC::Packet& p) {
+			p.reply(Stocks::get_stock_summary( p.content.substr(this->trigger().length()) ));
+		}
+
+		std::string get_stats(void) {
+			return "Stock Queries Done: " + std::to_string(queries_done);
 		}
 
 	};
