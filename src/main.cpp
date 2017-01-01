@@ -33,6 +33,14 @@ int main(int argc, char **argv) {
 			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
 	// The program SHOULD crash if the above 3 lines don't work.
 
+	try {
+		for (auto& a : ENVIRONMENT["bot"]["ignore"]) {
+			b.add_a(IRC::Bot::RELATIONSHIP::IGNORED, a.get<std::string>());
+		}
+	} catch (...) {
+		std::cerr << "Nobody to ignore.\n";
+	}
+
 	b.add_command( (IRC::CommandInterface*)( new Plugins::SayHiCommand         ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::GoogleCommand        ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::IPLookupCommand      ));

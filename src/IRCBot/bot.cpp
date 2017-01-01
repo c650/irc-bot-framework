@@ -104,6 +104,7 @@ namespace IRC {
 	void Bot::_check_for_triggers(const Packet& p) {
 
 		bool sender_is_admin = _is_admin(p.sender);
+		bool sender_is_ignored = _is_ignored(p.sender);
 
 		/* These are default commands, raw functionality, internal stuff... */
 		if (p.type == Packet::PacketType::NICK) {
@@ -117,7 +118,7 @@ namespace IRC {
 				if (i == p.sender)
 					i = p.content;
 
-		} else if (p.type == Packet::PacketType::PRIVMSG) {
+		} else if (p.type == Packet::PacketType::PRIVMSG && !sender_is_ignored) {
 			if (p.content.substr(0, 5) == "@help") {
 				for (const auto command : this->commands) {
 					if (sender_is_admin || !command->requires_admin())
@@ -138,6 +139,9 @@ namespace IRC {
 		} else if (p.type == Packet::PacketType::KICK) {
 			p.owner->join_channel( p.channel );
 		}
+
+		if (sender_is_ignored)
+			return;
 
 		/* Here we go through the user-added Commands */
 		for (auto command : this->commands) {    /* checks sender's perms.... */
@@ -165,6 +169,14 @@ namespace IRC {
 		std::cout << person << " is not an admin.\n";
 		return false;
 	}
+
+	bool Bot::_is_ignored(const std::string& person) {
+		for (auto& a : ignored)
+			if (a == person)
+				return true;
+		return false;
+	}
+
 
 	std::vector<std::string> Bot::get_stats(void) {
 		time_t t = std::chrono::system_clock::to_time_t(start_time);

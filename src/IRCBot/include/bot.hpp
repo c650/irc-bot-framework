@@ -146,6 +146,11 @@ namespace IRC {
 		*/
 		bool _is_admin(const std::string& person);
 
+		/*
+			Same as _is_admin but for ignored people
+		*/
+		bool _is_ignored(const std::string& person);
+
 		void connect_server(const std::vector<Server*>::iterator& it);
 		bool join_channel(const std::vector<Server*>::iterator& it, const std::string& channel_name);
 
