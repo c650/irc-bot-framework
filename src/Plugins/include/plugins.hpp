@@ -4,6 +4,7 @@
 #include "./googler.hpp"
 #include "./random-line-stream.hpp" /* for use in BabblerCommand */
 #include "./stocks.hpp"
+#include "./quotes.hpp"
 
 namespace Plugins {
 
@@ -129,7 +130,7 @@ namespace Plugins {
 
 		unsigned long long queries_done;
 
-	public:
+	  public:
 
 		StocksCommand() : CommandInterface("@stock ", "checks a stock ticker price."), queries_done(0) {}
 
@@ -143,6 +144,21 @@ namespace Plugins {
 
 		std::string get_stats(void) {
 			return "Stock Queries Done: " + std::to_string(queries_done);
+		}
+
+	};
+
+	class QuoteCommand : public IRC::CommandInterface {
+
+	  public:
+		QuoteCommand() : CommandInterface("@quote", "delivers the quote of the day.") {}
+
+		bool triggered(const IRC::Packet& p) {
+			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
+		}
+
+		void run(const IRC::Packet& p) {
+			p.reply(Quotes::get_random_quote());
 		}
 
 	};
