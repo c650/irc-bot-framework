@@ -10,14 +10,18 @@ namespace IRC {
 
 	class CommandInterface {
 
+	  protected:
+
 		std::string trigger_string, description;
 
 		bool req_admin;
 
-	public:
+		Bot *bot_ptr;
 
-		CommandInterface(const std::string& ts, const std::string& d = "No Description Set.", bool ra = false)
-			: trigger_string(ts), description(d), req_admin(ra) {}
+	  public:
+
+		CommandInterface(const std::string& ts, const std::string& d = "No Description Set.", Bot *b = nullptr, bool ra = false)
+			: trigger_string(ts), description(d), req_admin(ra), bot_ptr(b) {}
 
 		/*
 			Inheritors will complete this function to
@@ -46,6 +50,10 @@ namespace IRC {
 
 		std::string desc(void) const {
 			return description;
+		}
+
+		const Bot* bot(void) const {
+			return bot_ptr;
 		}
 
 	};

@@ -63,6 +63,11 @@ namespace IRC {
 	}
 
 	void Bot::add_command( CommandInterface* cmd ) {
+		if (cmd->bot() != nullptr && cmd->bot() != this) {
+			std::cerr << "You tried to add a command that references a different bot.\n";
+			delete cmd;
+			return;
+		}
 		commands.push_back(cmd);
 	}
 

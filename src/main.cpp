@@ -33,14 +33,14 @@ int main(int argc, char **argv) {
 			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
 	// The program SHOULD crash if the above 3 lines don't work.
 
-	b.add_command( (IRC::CommandInterface*)(new Plugins::SayHiCommand    ));
-	b.add_command( (IRC::CommandInterface*)(new Plugins::GoogleCommand   ));
-	b.add_command( (IRC::CommandInterface*)(new Plugins::IPLookupCommand ));
-	b.add_command( (IRC::CommandInterface*)(new Plugins::StocksCommand   ));
-	b.add_command( (IRC::CommandInterface*)(new Plugins::QuoteCommand    ));
-	b.add_command( (IRC::CommandInterface*)(new Plugins::SlapCommand     ));
-	b.add_command( (IRC::CommandInterface*)(new Plugins::SpeakCommand    ));
-	b.add_command( (IRC::CommandInterface*)(new Plugins::UtilityCommands ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::SayHiCommand         ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::GoogleCommand        ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::IPLookupCommand      ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::StocksCommand        ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::QuoteCommand         ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::SlapCommand          ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::SpeakCommand         ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::UtilityCommands(&b)  ));
 
 	try {
 		b.add_command( (IRC::CommandInterface*)(new Plugins::BabblerCommand( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );

@@ -8,13 +8,13 @@
 
 namespace Plugins {
 
-	class GoogleCommand : public IRC::CommandInterface {
+	class GoogleCommand : protected IRC::CommandInterface {
 
 		unsigned long long times_executed;
 
 	  public:
-		GoogleCommand()
-			: CommandInterface("@google ", "Performs google search and returns shortened links.", true), times_executed(0) {}
+		GoogleCommand()                                                                          /* pointer to owning bot not needed. */
+			: CommandInterface("@google ", "Performs google search and returns shortened links.", nullptr, true), times_executed(0) {}
 
 		bool triggered(const IRC::Packet& p) {
 			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
@@ -37,11 +37,11 @@ namespace Plugins {
 
 	};
 
-	class IPLookupCommand : public IRC::CommandInterface {
+	class IPLookupCommand : protected IRC::CommandInterface {
 
 	  public:
 
-		IPLookupCommand() : IRC::CommandInterface("@iplookup ", "looks up IP address.", true) {}
+		IPLookupCommand() : IRC::CommandInterface("@iplookup ", "looks up IP address.", nullptr, true) {}
 
 		bool triggered(const IRC::Packet& p) {
 			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
@@ -52,7 +52,7 @@ namespace Plugins {
 		}
 	};
 
-	class SayHiCommand : public IRC::CommandInterface {
+	class SayHiCommand : protected IRC::CommandInterface {
 
 	  public:
 
@@ -67,7 +67,7 @@ namespace Plugins {
 		}
 	};
 
-	class SlapCommand : public IRC::CommandInterface {
+	class SlapCommand : protected IRC::CommandInterface {
 
 	  public:
 
@@ -83,11 +83,11 @@ namespace Plugins {
 
 	};
 
-	class SpeakCommand : public IRC::CommandInterface {
+	class SpeakCommand : protected IRC::CommandInterface {
 
 	  public:
 
-		SpeakCommand() : IRC::CommandInterface("@speak ", "says a message to channel: @speak <chan> <msg...>", true) {}
+		SpeakCommand() : IRC::CommandInterface("@speak ", "says a message to channel: @speak <chan> <msg...>", nullptr, true) {}
 
 		bool triggered(const IRC::Packet& p) {
 			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
@@ -107,7 +107,7 @@ namespace Plugins {
 
 	};
 
-	class BabblerCommand : public IRC::CommandInterface {
+	class BabblerCommand : protected IRC::CommandInterface {
 
 		RandomLineStream rls;
 
@@ -126,7 +126,7 @@ namespace Plugins {
 
 	};
 
-	class StocksCommand : public IRC::CommandInterface {
+	class StocksCommand : protected IRC::CommandInterface {
 
 		unsigned long long queries_done;
 
@@ -148,7 +148,7 @@ namespace Plugins {
 
 	};
 
-	class QuoteCommand : public IRC::CommandInterface {
+	class QuoteCommand : protected IRC::CommandInterface {
 
 	  public:
 		QuoteCommand() : CommandInterface("@quote", "delivers the quote of the day.") {}
@@ -163,16 +163,20 @@ namespace Plugins {
 
 	};
 
-	class UtilityCommands : public IRC::CommandInterface {
+	class UtilityCommands : protected IRC::CommandInterface {
 
 	  public:
 
-		UtilityCommands() : IRC::CommandInterface("@kick,@join,@part,@quit", "does utility actions", true) {}
+		UtilityCommands(IRC::Bot* b = nullptr) : IRC::CommandInterface("@kick,@join,@part,@quit,@nick", "does utility actions", b, true) {
+			if (b == nullptr) {
+				throw std::logic_error("In UtilityCommands, Bot *b cannot be nullptr!");
+			}
+		}
 
 		bool triggered(const IRC::Packet& p) {
 			std::string cmd = p.content.substr(0,5);
 			return p.type == IRC::Packet::PacketType::PRIVMSG
-				&& ( cmd == "@kick" || cmd == "@join" || cmd == "@part" || cmd == "@quit" );
+				&& ( cmd == "@kick" || cmd == "@join" || cmd == "@part" || cmd == "@quit" || cmd == "@nick");
 		}
 
 		void run(const IRC::Packet& p) {
@@ -185,6 +189,8 @@ namespace Plugins {
 					p.owner->join_channel( p.content.substr(6 , p.content.find(" ", 6) - 6) );
 				} else if ( cmd == "@part" ) {
 					p.owner->part_channel( p.content.substr(6) );
+				} else if ( cmd == "@nick" ) {
+					p.owner->set_nick( p.content.substr(6) );
 				}
 			}
 
