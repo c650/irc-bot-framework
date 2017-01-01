@@ -32,10 +32,7 @@ namespace IRC {
 	}
 
 	void Bot::connect_server(const std::string& server_name) {
-		this->connect_server( _find_server_by_name(server_name) );
-	}
-
-	void Bot::connect_server(const std::vector<Server*>::iterator& it) {
+		auto it = _find_server_by_name(server_name);
 		if (it == servers.end())
 			return;
 		(*it)->start_connect();
@@ -43,9 +40,7 @@ namespace IRC {
 	}
 
 	bool Bot::join_channel(const std::string& server_name , const std::string& channel_name) {
-		return this->join_channel( _find_server_by_name(server_name) , channel_name );
-	}
-	bool Bot::join_channel(const std::vector<Server*>::iterator& it, const std::string& channel_name) {
+		auto it = _find_server_by_name(server_name);
 		if (it == servers.end())
 			return false;
 

@@ -151,9 +151,6 @@ namespace IRC {
 		*/
 		bool _is_ignored(const std::string& person);
 
-		void connect_server(const std::vector<Server*>::iterator& it);
-		bool join_channel(const std::vector<Server*>::iterator& it, const std::string& channel_name);
-
 		std::vector<std::string> get_stats(void);
 
 	};
