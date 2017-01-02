@@ -31,7 +31,9 @@ namespace MyHTTP {
 	/* see .hpp for docs */
 	bool get(const std::string& url, std::string& response) {
 
-		std::cout << "MyHTTP::get( " << url << " )\n";
+		#ifdef DEBUG
+			std::cout << "MyHTTP::get( " << url << " )\n";
+		#endif
 
 		CURL *curl = curl_easy_init();
 		CURLcode res = CURLE_OK;
@@ -50,7 +52,10 @@ namespace MyHTTP {
 
 	/* This remains untested (1/1/17) : */
 	bool post(const std::string& url, const nlohmann::json& params, std::string& response) {
-		std::cout << "MyHTTP::post( " << url << " , " << params << " )\n";
+
+		#ifdef DEBUG
+			std::cout << "MyHTTP::post( " << url << " , " << params << " )\n";
+		#endif
 
 		CURL *curl = curl_easy_init();
 		CURLcode res = CURLE_OK;

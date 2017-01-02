@@ -15,8 +15,6 @@ namespace Quotes {
 
 			nlohmann::json data = nlohmann::json::parse(response);
 
-			std::cout << data << '\n';
-
 			return data["quote"]["body"].get<std::string>() + " -- " + data["quote"]["author"].get<std::string>();
 
 		} catch (std::exception& e) {
