@@ -5,7 +5,8 @@
 namespace IRC {
 
 	Bot::Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins)
-		: nick(n) , password(pass), start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0)
+		: nick(n) , password(pass),
+		  start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0)
 	{
 		for (auto& a : _admins)
 			admins.push_back(a);
