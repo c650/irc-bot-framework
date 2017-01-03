@@ -11,7 +11,7 @@ namespace IRC {
 		: nick(n) , password(pass),
 		  start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0)
 	{
-		std::lock_guard<std::mutex> guard(admin_mutex); // just in case, because admins is a shared resource and should always be protected.
+		std::lock_guard<std::mutex> guard(this->admin_mutex); // just in case, because admins is a shared resource and should always be protected.
 		for (auto& a : _admins)
 			admins.push_back(a);
 	}
@@ -22,7 +22,7 @@ namespace IRC {
 				delete s;
 		}
 
-		std::lock_guard<std::mutex> guard(commands_mutex);
+		std::lock_guard<std::mutex> guard(this->commands_mutex);
 		for (CommandInterface* c : commands) {
 			if (c)
 				delete c;
@@ -77,7 +77,7 @@ namespace IRC {
 			return;
 		}
 
-		std::lock_guard<std::mutex> guard(commands_mutex);
+		std::lock_guard<std::mutex> guard(this->commands_mutex);
 		commands.push_back(cmd);
 	}
 
@@ -143,7 +143,7 @@ namespace IRC {
 
 			if (p.content.substr(0, 5) == "@help") {
 
-				std::lock_guard<std::mutex> guard(commands_mutex);
+				std::lock_guard<std::mutex> guard(this->commands_mutex);
 				for (const auto command : this->commands) {
 					if (sender_is_admin || !command->requires_admin())
 						p.owner->privmsg(p.sender, command->trigger() + ": " + command->desc());
@@ -156,7 +156,7 @@ namespace IRC {
 					p.owner->privmsg(p.sender , s);
 				}
 
-				std::lock_guard<std::mutex> guard(commands_mutex);
+				std::lock_guard<std::mutex> guard(this->commands_mutex);
 				for (const auto command : this->commands) {
 					p.owner->privmsg(p.sender, command->get_stats());
 				}
@@ -170,14 +170,14 @@ namespace IRC {
 		if (sender_is_ignored)
 			return;
 
-		std::lock_guard<std::mutex> guard(commands_mutex);
+		std::lock_guard<std::mutex> guard(this->commands_mutex);
 
 		/* Here we go through the user-added Commands */
 		for (auto command : this->commands) {    /* checks sender's perms.... */
 			if (command->triggered(p) && (sender_is_admin || !command->requires_admin())) {
 				command->run(p);
 
-				std::lock_guard<std::mutex> guard(stat_mutex); // stat-tracking commands requires this :)
+				std::lock_guard<std::mutex> guard(this->stat_mutex); // stat-tracking commands requires this :)
 				this->commands_executed++;
 			}
 		}
