@@ -2,6 +2,8 @@
 #include "./include/packet.hpp"
 #include "./include/server.hpp"
 
+#include <thread>
+
 namespace IRC {
 
 	Bot::Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins)
@@ -68,31 +70,37 @@ namespace IRC {
 	}
 
 	void Bot::listen() {
-		bool got_resp = false; /* checks if at least one server gives resp. */
-		do {
+		std::vector<std::thread> threads;
+		for (Server* s : servers) {
+			threads.push_back(std::thread([this, s]{this->listen_to_server(s);} ));
+		}
+		for (auto& t : threads)
+			t.join();
+	}
+
+	void Bot::listen_to_server(Server* s) {
+		bool got_resp = true; /* checks if at least one server gives resp. */
+		while(got_resp) {
 			got_resp = false;
 
 			Packet p;
-			for (Server* s : servers) {
 
-				try {
-					p = s->receive();
-				} catch (std::exception& e) {
-					std::cerr << e.what() << '\n';
-					continue;
-				}
-
-				p.owner = s;
-
-				if (p.is_valid()) {
-					this->packets_received++;
-					this->_check_for_triggers(p);
-					got_resp = true;
-				}
-				got_resp = got_resp || !p.content.empty();
+			try {
+				p = s->receive();
+			} catch (std::exception& e) {
+				std::cerr << e.what() << '\n';
+				continue;
 			}
 
-		} while (got_resp);
+			p.owner = s;
+
+			if (p.is_valid()) {
+				this->packets_received++;
+				this->_check_for_triggers(p);
+				got_resp = true;
+			}
+			got_resp = got_resp || !p.content.empty();
+		}
 	}
 
 	/* helpers */

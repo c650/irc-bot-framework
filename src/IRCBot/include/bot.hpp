@@ -153,6 +153,8 @@ namespace IRC {
 
 		std::vector<std::string> get_stats(void);
 
+		void listen_to_server(Server* s);
+
 	};
 };
 #endif
