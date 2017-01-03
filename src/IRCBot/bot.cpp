@@ -11,7 +11,7 @@ namespace IRC {
 		: nick(n) , password(pass),
 		  start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0)
 	{
-		std::lock_guard<std::mutex> guard(admins_mutex); // just in case, because admins is a shared resource and should always be protected.
+		std::lock_guard<std::mutex> guard(admin_mutex); // just in case, because admins is a shared resource and should always be protected.
 		for (auto& a : _admins)
 			admins.push_back(a);
 	}
@@ -56,18 +56,18 @@ namespace IRC {
 
 	void Bot::add_a(const Bot::RELATIONSHIP& r , const std::string& user) {
 		switch(r) {
-		case RELATIONSHIP::ADMIN:
+		case RELATIONSHIP::ADMIN: {
 
-			std::lock_guard<std::mutex> guard(admins_mutex);
+			std::lock_guard<std::mutex> guard_admin(admin_mutex);
 			admins.push_back(user);
 			break; // this is important!
 
-		case RELATIONSHIP::IGNORED:
+		} case RELATIONSHIP::IGNORED: {
 
-			std::lock_guard<std::mutex> guard(ignored_mutex);
+			std::lock_guard<std::mutex> guard_ignored(ignored_mutex);
 			ignored.push_back(user);
 			break;
-		}
+		}}
 	}
 
 	void Bot::add_command( CommandInterface* cmd ) {
@@ -127,7 +127,7 @@ namespace IRC {
 
 			/* update admins and ignored based on nick changes. */
 
-			std::unique_lock<std::mutex> guard_admin(admins_mutex); // using unique lock so that I can unlock before scope ends.
+			std::unique_lock<std::mutex> guard_admin(admin_mutex); // using unique lock so that I can unlock before scope ends.
 			for (auto& s : admins)
 				if (s == p.sender)
 					s = p.content;
@@ -140,7 +140,7 @@ namespace IRC {
 			// not unlocking because Scope ends anyway.
 
 		} else if (p.type == Packet::PacketType::PRIVMSG && !sender_is_ignored) {
-			
+
 			if (p.content.substr(0, 5) == "@help") {
 
 				std::lock_guard<std::mutex> guard(commands_mutex);
@@ -196,7 +196,7 @@ namespace IRC {
 	}
 
 	bool Bot::_is_admin(const std::string& person) {
-		std::lock_guard<std::mutex> guard(this->admins_mutex); // protect admins
+		std::lock_guard<std::mutex> guard(this->admin_mutex); // protect admins
 
 		for (auto& a : admins)
 			if (a == person)
