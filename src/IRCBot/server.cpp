@@ -19,10 +19,6 @@
 #include "./include/packet.hpp"
 #include "./include/ssl_connection.hpp"
 
-static void rate_limiter(const unsigned long long& ms ) {
-	std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-}
-
 namespace IRC {
 
 	Server::Server( const std::string& n, const std::string& a , const int& p , bool with_ssl)
@@ -74,16 +70,12 @@ namespace IRC {
 
 	Packet Server::receive() {
 
-		std::thread rate_limit(rate_limiter, 500);
-
 		std::string s = this->connection->receive();
 		if (s.substr(0,4) == "PING") {
 			s.replace(0,2, "\rPO");
 			_send(s);
 		}
 		Packet p(s);
-
-		rate_limit.join();
 
 		return p;
 	}
