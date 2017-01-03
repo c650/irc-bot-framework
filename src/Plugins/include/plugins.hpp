@@ -6,6 +6,7 @@
 #include "./random-line-stream.hpp" /* for use in BabblerCommand */
 #include "./stocks.hpp"
 #include "./quotes.hpp"
+#include "./http.hpp"
 
 #include <algorithm>
 #include <string>
@@ -38,6 +39,23 @@ namespace Plugins {
 
 		std::string get_stats(void) {
 			return "GoogleCommand -> Times Executed: " + std::to_string(this->times_executed);
+		}
+
+	};
+
+	class LMGTFYCommand : protected IRC::CommandInterface {
+
+	public:
+
+		LMGTFYCommand()
+			: CommandInterface("@lmgtfy ", "mean way to tell ppl to google things.") {}
+
+		bool triggered(const IRC::Packet& p) {
+			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
+		}
+
+		void run(const IRC::Packet& p) {
+			p.reply("http://lmgtfy.com/?q=" + MyHTTP::uri_encode( p.content.substr(this->trigger().length()) ) );
 		}
 
 	};

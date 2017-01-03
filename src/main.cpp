@@ -43,6 +43,7 @@ int main(int argc, char **argv) {
 
 	b.add_command( (IRC::CommandInterface*)( new Plugins::SayHiCommand         ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::GoogleCommand        ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::LMGTFYCommand        ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::IPLookupCommand      ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::StocksCommand        ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::QuoteCommand         ));
