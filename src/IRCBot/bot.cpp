@@ -3,6 +3,7 @@
 #include "./include/server.hpp"
 
 #include <thread>
+#include <mutex>
 
 namespace IRC {
 
@@ -10,6 +11,7 @@ namespace IRC {
 		: nick(n) , password(pass),
 		  start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0)
 	{
+		std::lock_guard<std::mutex> guard(admins_mutex); // just in case, because admins is a shared resource and should always be protected.
 		for (auto& a : _admins)
 			admins.push_back(a);
 	}
@@ -20,6 +22,7 @@ namespace IRC {
 				delete s;
 		}
 
+		std::lock_guard<std::mutex> guard(commands_mutex);
 		for (CommandInterface* c : commands) {
 			if (c)
 				delete c;
@@ -54,9 +57,16 @@ namespace IRC {
 	void Bot::add_a(const Bot::RELATIONSHIP& r , const std::string& user) {
 		switch(r) {
 		case RELATIONSHIP::ADMIN:
+
+			std::lock_guard<std::mutex> guard(admins_mutex);
 			admins.push_back(user);
+			break; // this is important!
+
 		case RELATIONSHIP::IGNORED:
+
+			std::lock_guard<std::mutex> guard(ignored_mutex);
 			ignored.push_back(user);
+			break;
 		}
 	}
 
@@ -66,19 +76,21 @@ namespace IRC {
 			delete cmd;
 			return;
 		}
+
+		std::lock_guard<std::mutex> guard(commands_mutex);
 		commands.push_back(cmd);
 	}
 
 	void Bot::listen() {
 		std::vector<std::thread> threads;
 		for (Server* s : servers) {
-			threads.push_back(std::thread([this, s]{this->listen_to_server(s);} ));
+			threads.push_back(std::thread([this, s]{this->_listen_to_server(s);} ));
 		}
 		for (auto& t : threads)
 			t.join();
 	}
 
-	void Bot::listen_to_server(Server* s) {
+	void Bot::_listen_to_server(Server* s) {
 		bool got_resp = true; /* checks if at least one server gives resp. */
 		while(got_resp) {
 			got_resp = false;
@@ -113,27 +125,38 @@ namespace IRC {
 		/* These are default commands, raw functionality, internal stuff... */
 		if (p.type == Packet::PacketType::NICK) {
 
-			// update admins and ignored based on nick changes.
+			/* update admins and ignored based on nick changes. */
+
+			std::unique_lock<std::mutex> guard_admin(admins_mutex); // using unique lock so that I can unlock before scope ends.
 			for (auto& s : admins)
 				if (s == p.sender)
 					s = p.content;
+			guard_admin.unlock();
 
+			std::lock_guard<std::mutex> guard_ignored(ignored_mutex);
 			for (auto& i : ignored)
 				if (i == p.sender)
 					i = p.content;
+			// not unlocking because Scope ends anyway.
 
 		} else if (p.type == Packet::PacketType::PRIVMSG && !sender_is_ignored) {
+			
 			if (p.content.substr(0, 5) == "@help") {
+
+				std::lock_guard<std::mutex> guard(commands_mutex);
 				for (const auto command : this->commands) {
 					if (sender_is_admin || !command->requires_admin())
 						p.owner->privmsg(p.sender, command->trigger() + ": " + command->desc());
 				}
 				return;
+
 			} else if (p.content.substr(0, 6) == "@stats" && sender_is_admin) {
+
 				for (const auto& s : this->get_stats()) {
 					p.owner->privmsg(p.sender , s);
 				}
 
+				std::lock_guard<std::mutex> guard(commands_mutex);
 				for (const auto command : this->commands) {
 					p.owner->privmsg(p.sender, command->get_stats());
 				}
@@ -147,26 +170,34 @@ namespace IRC {
 		if (sender_is_ignored)
 			return;
 
+		std::lock_guard<std::mutex> guard(commands_mutex);
+
 		/* Here we go through the user-added Commands */
 		for (auto command : this->commands) {    /* checks sender's perms.... */
 			if (command->triggered(p) && (sender_is_admin || !command->requires_admin())) {
 				command->run(p);
+
+				std::lock_guard<std::mutex> guard(stat_mutex); // stat-tracking commands requires this :)
 				this->commands_executed++;
 			}
 		}
 
 	}
 
+	// TODO: Just return Server*'s for less overhead and bullsh*t
 	std::vector<Server*>::iterator Bot::_find_server_by_name(const std::string& n) {
-		 for (size_t i = 0; i < servers.size(); ++i) {
-			 if (servers.at(i)->get_name() == n) {
-				 return servers.begin() + i;
-			 }
-		 }
-		 return servers.end();
+
+		for (size_t i = 0; i < servers.size(); ++i) {
+			if (servers.at(i)->get_name() == n) {
+				return servers.begin() + i;
+			}
+		}
+		return servers.end();
 	}
 
 	bool Bot::_is_admin(const std::string& person) {
+		std::lock_guard<std::mutex> guard(this->admins_mutex); // protect admins
+
 		for (auto& a : admins)
 			if (a == person)
 				return true;
@@ -175,6 +206,8 @@ namespace IRC {
 	}
 
 	bool Bot::_is_ignored(const std::string& person) {
+		std::lock_guard<std::mutex> guard(this->ignored_mutex); // protect ignore list.
+
 		for (auto& a : ignored)
 			if (a == person)
 				return true;
@@ -183,6 +216,8 @@ namespace IRC {
 
 
 	std::vector<std::string> Bot::get_stats(void) {
+		std::lock_guard<std::mutex> guard(this->stat_mutex);
+
 		time_t t = std::chrono::system_clock::to_time_t(start_time);
 		return std::vector<std::string>{ "Up Since: " + std::string(std::ctime(&t)),
 				 "Packets Received: " + std::to_string(this->packets_received),

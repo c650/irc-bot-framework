@@ -199,7 +199,7 @@ namespace Plugins {
 				} else if ( cmd == "@adda" ) {
 					std::vector<std::string> args;
 					p.get_args(args);
-					if (args.size() != 3) {
+					if (args.size() < 3) {
 						p.owner->privmsg(p.sender, "Error. Usage: @adda TYPE name");
 						return;
 					}

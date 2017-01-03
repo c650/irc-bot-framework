@@ -10,6 +10,7 @@
 #include <ctime>
 
 #include <algorithm>
+#include <mutex>
 
 #include "./types.hpp"
 #include "./command-interface.hpp"
@@ -33,6 +34,12 @@ namespace IRC {
 		/* For Stats: */
 		std::chrono::time_point<std::chrono::system_clock> start_time;
 		unsigned long long packets_received, packets_sent, commands_executed;
+
+		std::mutex stat_mutex,
+		           admin_mutex,
+		           ignored_mutex,
+				   commands_mutex;
+				   // A servers_mutex is not needed since each server occupies its own thread and shares no data.
 
 	public:
 
@@ -153,7 +160,7 @@ namespace IRC {
 
 		std::vector<std::string> get_stats(void);
 
-		void listen_to_server(Server* s);
+		void _listen_to_server(Server* s);
 
 	};
 };
