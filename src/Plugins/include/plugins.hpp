@@ -163,6 +163,7 @@ namespace Plugins {
 
 		void run(const IRC::Packet& p) {
 			p.reply(Stocks::get_stock_summary( p.content.substr(this->trigger().length()) ));
+			this->queries_done++;
 		}
 
 		std::string get_stats(void) {
