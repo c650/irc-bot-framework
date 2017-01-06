@@ -60,14 +60,11 @@ namespace IRC {
 			@param _admins a vector of strings representing the
 				current nicks of admins. Note: Admins may change their
 				nicks once the bot comes on; the bot tracks NICK changes.
+			@param sha256_recovery_pw [optional] the password to use to gain admin privs
+				from an account with a different identity.
 
 		*/
-		Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins);
-
-		/*
-			Same as above, but with a recovery password param.
-		*/
-		Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins, const std::string& sha256_recovery_pw);
+		Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins, const std::string& sha256_recovery_pw = "");
 
 		/*
 			Deallocates servers and commands.
