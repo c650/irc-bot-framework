@@ -71,6 +71,13 @@ namespace IRC {
 		*/
 		~Bot();
 
+		/*
+			Sets the sha256sum for a recovery password...
+
+			@param rpw the sha256sum of the password.
+		*/
+		void set_recovery_sha256(const std::string& rpw);
+
 		/* Adds a server.
 
 			@param n the name of the server.

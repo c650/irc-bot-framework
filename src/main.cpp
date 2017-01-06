@@ -30,9 +30,14 @@ int main(int argc, char **argv) {
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
 	IRC::Bot b(ENVIRONMENT["bot"]["nick"].get<std::string>(), /* Nickname */
 	           ENVIRONMENT["bot"]["pass"].get<std::string>(), /* Password, can be "" */
-			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>(), /* List of admins. */
-		       ENVIRONMENT["bot"]["recovery_sha256"].get<std::string>());
-	// The program SHOULD crash if the above 3 lines don't work.
+			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
+	// The program SHOULD crash if the above 4 lines don't work.
+
+	try {
+		b.set_recovery_sha256(ENVIRONMENT["bot"]["recovery_sha256"].get<std::string>());
+	} catch (...) {
+		std::cout << "No recovery password was provided... Moving on without it...\n";
+	}
 
 	try {
 		for (auto& a : ENVIRONMENT["bot"]["ignore"]) {
@@ -59,7 +64,6 @@ int main(int argc, char **argv) {
 		std::cerr << "Failed to add Babbler\n";
 	}
 
-
 	/* Add a server and connect to it by name */
 	/* SSL is used by default. To disable it, pass `false` in place of the with_ssl arg. */
 	for (auto& server : ENVIRONMENT["servers"]) {
@@ -69,7 +73,6 @@ int main(int argc, char **argv) {
 
 	/* Listen on the server(s) for input! */
 	b.listen();
-
 
 	return 0;
 }

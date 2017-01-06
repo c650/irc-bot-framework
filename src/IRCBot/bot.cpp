@@ -30,6 +30,10 @@ namespace IRC {
 		}
 	}
 
+	void Bot::set_recovery_sha256(const std::string& rpw) {
+		recovery_password_sha256 = rpw;
+	}
+
 	void Bot::add_server(std::string n , const std::string& a , const int& port, bool with_ssl) {
 		for (const Server* s : servers) {
 			if (s->get_name() == n)
