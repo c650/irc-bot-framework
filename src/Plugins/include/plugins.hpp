@@ -1,18 +1,20 @@
 #include "../../IRCBot/include/command-interface.hpp"
 #include "../../IRCBot/include/bot.hpp"
 
+#include "./random-line-stream.hpp" /* for use in BabblerCommand */
 #include "./iplookup.hpp"
 #include "./googler.hpp"
-#include "./random-line-stream.hpp" /* for use in BabblerCommand */
 #include "./stocks.hpp"
 #include "./quotes.hpp"
 #include "./http.hpp"
+#include "./hash.hpp"
 
 #include <algorithm>
 #include <string>
 #include <vector>
 
 namespace Plugins {
+
 
 	class GoogleCommand : protected IRC::CommandInterface {
 
@@ -45,11 +47,10 @@ namespace Plugins {
 
 	class LMGTFYCommand : protected IRC::CommandInterface {
 
-	public:
+	  public:
 
 		LMGTFYCommand()
 			: CommandInterface("@lmgtfy ", "mean way to tell ppl to google things.") {}
-
 		bool triggered(const IRC::Packet& p) {
 			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
 		}
@@ -191,7 +192,7 @@ namespace Plugins {
 
 	  public:
 
-		UtilityCommands(IRC::Bot* b = nullptr) : IRC::CommandInterface("@kick,@join,@part,@quit,@nick,@adda", "does utility actions", b, true) {
+		UtilityCommands(IRC::Bot *b = nullptr) : IRC::CommandInterface("@kick,@join,@part,@quit,@nick,@adda", "does utility actions", b, true) {
 			if (b == nullptr) {
 				throw std::logic_error("In UtilityCommands, Bot *b cannot be nullptr!");
 			}
@@ -244,6 +245,28 @@ namespace Plugins {
 
 			if (cmd == "@quit") { // quit
 				p.owner->disconnect( p.content.length() > 6 ? p.content.substr(6) : "Quitting..." );
+			}
+		}
+	};
+
+	class RecoveryCommand : public IRC::CommandInterface {
+
+	  public:
+
+		RecoveryCommand(IRC::Bot *b = nullptr) : CommandInterface("@recover ", "recover the bot with a password.", b) {}
+
+		bool triggered(const IRC::Packet& p) {
+			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
+		}
+
+		void run(const IRC::Packet& p) {
+
+			std::string password = p.content.substr(this->trigger().length());
+
+			if ( bot_ptr->reauthenticate(p.sender, Hash::sha256(password)) ) {
+				p.owner->privmsg(p.sender, "Password accepted! You now have admin rights.");
+			} else {
+				p.owner->privmsg(p.sender, "Denied. Password invalid.");
 			}
 		}
 	};

@@ -31,6 +31,8 @@ namespace IRC {
 
 		std::vector<CommandInterface*> commands;
 
+		std::string recovery_password_sha256;
+
 		/* For Stats: */
 		std::chrono::time_point<std::chrono::system_clock> start_time;
 		unsigned long long packets_received, packets_sent, commands_executed;
@@ -61,6 +63,11 @@ namespace IRC {
 
 		*/
 		Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins);
+
+		/*
+			Same as above, but with a recovery password param.
+		*/
+		Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins, const std::string& sha256_recovery_pw);
 
 		/*
 			Deallocates servers and commands.
@@ -112,6 +119,19 @@ namespace IRC {
 			@param user the user to relate to.
 		*/
 		void add_a(const RELATIONSHIP& r , const std::string& user);
+
+		/*
+			Reauthenticates the user by comparing hash_of_password to an internally-stored
+			SHA256sum.
+
+			@param user the user to reauthenticate. Upon success, the user is added to
+				the admin list.
+			@param hash_of_password a precalculated SHA256sum of the password submitted by
+				the user.
+
+			@return whether the reauthentication was successful.
+		*/
+		bool reauthenticate(const std::string& user, const std::string hash_of_password);
 
 		/*
 			Adds the CommandInterface cmd to the list of commands.

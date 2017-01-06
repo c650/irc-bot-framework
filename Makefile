@@ -10,7 +10,7 @@ OUT= bin/bot.out
 OPTIMIZE= -Os # reduce code size...
 
 build: ${SRC}
-	${CC} ${OPTIMIZE} ${CFLAGS} -o ${OUT} ${SRC} ${LDFLAGS} ${LDLIBS}
+	${CC} ${OPTIMIZE} ${CFLAGS} -o ${OUT} ${SRC} ${LDFLAGS} ${LDLIBS} -DDEBUG
 
 .PHONY: clean static
 

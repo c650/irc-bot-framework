@@ -30,7 +30,8 @@ int main(int argc, char **argv) {
 	/* Simple startup. Initialize a bot with a nick, password, and admin. */
 	IRC::Bot b(ENVIRONMENT["bot"]["nick"].get<std::string>(), /* Nickname */
 	           ENVIRONMENT["bot"]["pass"].get<std::string>(), /* Password, can be "" */
-			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>()); /* List of admins. */
+			   ENVIRONMENT["bot"]["admins"].get<std::vector<std::string>>(), /* List of admins. */
+		       ENVIRONMENT["bot"]["recovery_sha256"].get<std::string>());
 	// The program SHOULD crash if the above 3 lines don't work.
 
 	try {
@@ -50,6 +51,7 @@ int main(int argc, char **argv) {
 	b.add_command( (IRC::CommandInterface*)( new Plugins::SlapCommand          ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::SpeakCommand         ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::UtilityCommands(&b)  ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::RecoveryCommand(&b)  ));
 
 	try {
 		b.add_command( (IRC::CommandInterface*)(new Plugins::BabblerCommand( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );

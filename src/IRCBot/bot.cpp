@@ -8,8 +8,12 @@
 namespace IRC {
 
 	Bot::Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins)
+		: Bot(n,pass,_admins,"") {}
+
+	Bot::Bot(const std::string& n, const std::string& pass, const std::vector<std::string>& _admins, const std::string& sha256_recovery_pw)
 		: nick(n) , password(pass),
-		  start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0)
+		  start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0),
+		  recovery_password_sha256(sha256_recovery_pw)
 	{
 		std::lock_guard<std::mutex> guard(this->admin_mutex); // just in case, because admins is a shared resource and should always be protected.
 		for (auto& a : _admins)
@@ -58,16 +62,32 @@ namespace IRC {
 		switch(r) {
 		case RELATIONSHIP::ADMIN: {
 
+			if (_is_admin(user)) {
+				return;
+			}
+
 			std::lock_guard<std::mutex> guard_admin(admin_mutex);
 			admins.push_back(user);
 			break; // this is important!
 
 		} case RELATIONSHIP::IGNORED: {
 
+			if (_is_ignored(user)) {
+				return;
+			}
+
 			std::lock_guard<std::mutex> guard_ignored(ignored_mutex);
 			ignored.push_back(user);
 			break;
 		}}
+	}
+
+	bool Bot::reauthenticate(const std::string& user, const std::string hash_of_password) {
+		if (hash_of_password == this->recovery_password_sha256) {
+			this->add_a(Bot::RELATIONSHIP::ADMIN, user);
+			return true;
+		}
+		return false;
 	}
 
 	void Bot::add_command( CommandInterface* cmd ) {
