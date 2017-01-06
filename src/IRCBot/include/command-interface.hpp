@@ -2,6 +2,7 @@
 #define _COMMAND_INTERFACE_H
 
 #include "./types.hpp"
+#include "./packet.hpp"
 
 #include <functional>
 #include <string>
@@ -31,8 +32,13 @@ namespace IRC {
 			@param p the packet to inspect.
 
 			@return whether the packet is triggering.
+
+			note: I'm making this have a default because most commands have
+			a typical trigger behaviour.
 		*/
-		virtual bool triggered(const Packet& p) = 0;
+		virtual bool triggered(const Packet& p) {
+			return p.type == Packet::PacketType::PRIVMSG && p.content.substr(0, this->trigger_string.length()) == this->trigger_string;
+		}
 
 		virtual void run(const Packet& p) = 0;
 

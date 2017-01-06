@@ -24,10 +24,6 @@ namespace Plugins {
 		GoogleCommand()                                                                          /* pointer to owning bot not needed. */
 			: CommandInterface("@google ", "Performs google search and returns shortened links.", nullptr, true), times_executed(0) {}
 
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
-
 		void run(const IRC::Packet& p) {
 			std::vector<std::string> res_vec;
 
@@ -51,9 +47,6 @@ namespace Plugins {
 
 		LMGTFYCommand()
 			: CommandInterface("@lmgtfy ", "mean way to tell ppl to google things.") {}
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
 
 		void run(const IRC::Packet& p) {
 			p.reply("http://lmgtfy.com/?q=" + MyHTTP::uri_encode( p.content.substr(this->trigger().length()) ) );
@@ -67,10 +60,6 @@ namespace Plugins {
 
 		IPLookupCommand() : IRC::CommandInterface("@iplookup ", "looks up IP address.", nullptr, true) {}
 
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
-
 		void run(const IRC::Packet& p) {
 			p.reply(IPLookup::do_lookup(p.content.substr(this->trigger().length())));
 		}
@@ -81,10 +70,6 @@ namespace Plugins {
 	  public:
 
 		SayHiCommand() : IRC::CommandInterface("@sayhi", "says hi.") {}
-
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0, this->trigger().length()) == this->trigger();
-		}
 
 		void run(const IRC::Packet& p) {
 			p.reply("Hello!");
@@ -97,10 +82,6 @@ namespace Plugins {
 
 		SlapCommand() : IRC::CommandInterface("@slap ", "slaps arguments.") {}
 
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
-
 		void run(const IRC::Packet& p) {
 			p.reply("\001ACTION slapped the hell outta " + p.content.substr(this->trigger().length()) + "\001");
 		}
@@ -112,10 +93,6 @@ namespace Plugins {
 	  public:
 
 		SpeakCommand() : IRC::CommandInterface("@speak ", "says a message to channel: @speak <chan> <msg...>", nullptr, true) {}
-
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
 
 		void run(const IRC::Packet& p) {
 			std::string arguments = p.content.substr(this->trigger().length()); // everything after "@speak "
@@ -140,10 +117,6 @@ namespace Plugins {
 		BabblerCommand(const std::string& babbles_filepath)
 			: CommandInterface("@babble", "does a babble."), rls(babbles_filepath) {}
 
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
-
 		void run(const IRC::Packet& p) {
 			p.reply(rls.sample());
 		}
@@ -157,10 +130,6 @@ namespace Plugins {
 	  public:
 
 		StocksCommand() : CommandInterface("@stock ", "checks a stock ticker price."), queries_done(0) {}
-
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
 
 		void run(const IRC::Packet& p) {
 			p.reply(Stocks::get_stock_summary( p.content.substr(this->trigger().length()) ));
@@ -177,10 +146,6 @@ namespace Plugins {
 
 	  public:
 		QuoteCommand() : CommandInterface("@quote", "delivers the quote of the day.") {}
-
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
 
 		void run(const IRC::Packet& p) {
 			p.reply(Quotes::get_random_quote());
@@ -254,10 +219,6 @@ namespace Plugins {
 	  public:
 
 		RecoveryCommand(IRC::Bot *b = nullptr) : CommandInterface("@recover ", "recover the bot with a password.", b) {}
-
-		bool triggered(const IRC::Packet& p) {
-			return p.type == IRC::Packet::PacketType::PRIVMSG && p.content.substr(0,this->trigger().length()) == this->trigger();
-		}
 
 		void run(const IRC::Packet& p) {
 
