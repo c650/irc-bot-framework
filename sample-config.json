@@ -4,7 +4,9 @@
 		"pass":"",
 		"admins": [
 			"YOU"
-		]
+		],
+		"ignore" : [],
+		"recovery_sha256" : "SHA256 HASH OF PASSWORD"
 	},
 
 	"servers" : {
