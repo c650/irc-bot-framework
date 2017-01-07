@@ -53,6 +53,7 @@ int main(int argc, char **argv) {
 	b.add_command( (IRC::CommandInterface*)( new Plugins::IPLookupCommand      ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::StocksCommand        ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::QuoteCommand         ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::EliteCommand         ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::SlapCommand          ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::SpeakCommand         ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::UtilityCommands(&b)  ));
