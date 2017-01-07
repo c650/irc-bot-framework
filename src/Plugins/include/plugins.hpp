@@ -183,7 +183,15 @@ namespace Plugins {
 		void run(const IRC::Packet& p) {
 			std::string sub = p.content.substr(this->trigger_string.length());
 
-			std::string msg = sub.substr(sub.find(" "));
+			std::string msg = "";
+
+			try {
+				msg = sub.substr(sub.find(" "));
+			} catch (std::exception& e) {
+				std::cerr << "EliteCommand::run() error: " << e.what() << '\n';
+				p.reply("Error. Usage: @1337 [to1337 | from1337] [message...]");
+			}
+
 			sub = sub.substr(0, sub.find(" "));
 			if (sub == "from1337") {
 				for (auto& e : msg) {
