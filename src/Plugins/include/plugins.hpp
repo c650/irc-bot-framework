@@ -8,6 +8,7 @@
 #include "./quotes.hpp"
 #include "./http.hpp"
 #include "./hash.hpp"
+#include "./urban.hpp"
 
 #include <algorithm>
 #include <string>
@@ -50,6 +51,23 @@ namespace Plugins {
 
 		void run(const IRC::Packet& p) {
 			p.reply("http://lmgtfy.com/?q=" + MyHTTP::uri_encode( p.content.substr(this->trigger().length()) ) );
+		}
+
+	};
+
+	class UrbanCommand : protected IRC::CommandInterface {
+
+	public:
+
+		UrbanCommand()
+			: CommandInterface("@urban ", "checks urban dictionary for a definition.") {}
+
+		void run(const IRC::Packet& p) {
+			std::string def = "";
+			Urban::get_first_result(p.content.substr(this->trigger_string.length()) , def);
+			if (!def.empty()) {
+				p.reply(def);
+			}
 		}
 
 	};
