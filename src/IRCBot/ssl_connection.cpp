@@ -6,6 +6,9 @@
 #include <cstring>
 #include <string>
 
+#include <chrono>
+#include <thread>
+
 #include <openssl/ssl.h>
 
 namespace SSLWrapper {
@@ -94,20 +97,33 @@ namespace SSLWrapper {
 		if (!this->is_connected())
 			return -1;
 
-		// int ret;
-		// for (size_t i = 0; i < msg.length(); /* see 94 */) {
-		// 	ret = SSL_write(ssl_handle, msg.data()+i, msg.length()-i);
-		// 	if (ret > 0) {
-		// 		i += ret;
-		// 	} else {
-		// 		switch(SSL_get_error(ssl_handle, sent))
-		// 	}
-		// }
-		int ret = SSL_write(ssl_handle, msg.data(), msg.length());
-		if (ret < 0) {
-			std::cerr << "Failed to send data. Disconnecting...\n";
-			this->disconnect();
+		int ret;
+		for (size_t i = 0; i < msg.length(); ) {
+			ret = SSL_write(ssl_handle, msg.data()+i, msg.length()-i);
+			if (ret > 0) {
+				i += ret;
+			} else {
+				switch(SSL_get_error(ssl_handle, ret)) {
+					case SSL_ERROR_ZERO_RETURN:
+						this->disconnect();
+						std::cerr << "SSLConnection::send(): The socket disconnected!\n";
+						return ret;
+					case SSL_ERROR_WANT_READ:
+					case SSL_ERROR_WANT_WRITE:
+						std::this_thread::sleep_for(std::chrono::milliseconds(200));
+						break;
+					default:
+						std::cerr << "SSLConnection::send(): Could not send data.\n";
+						return ret;
+				}
+			}
 		}
+
+		// int ret = SSL_write(ssl_handle, msg.data(), msg.length());
+		// if (ret < 0) {
+		// 	std::cerr << "Failed to send data. Disconnecting...\n";
+		// 	this->disconnect();
+		// }
 
 		return ret;
 	}

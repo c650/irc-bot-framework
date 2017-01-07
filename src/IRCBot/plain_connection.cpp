@@ -88,11 +88,22 @@ namespace SSLWrapper {
 		if ( !this->is_connected() )
 			return -1;
 
-		int ret = write(this->connection_socket_fd , msg.data(), msg.length());
-		if (ret < 0) {
-			std::cerr << "Could not send data.\n";
-			this->disconnect();
+		int ret;
+		for (size_t i = 0; i < msg.length(); ) {
+			ret = write(this->connection_socket_fd, msg.data()+i, msg.length()-i);
+			if (ret > 0) {
+				i += ret;
+			} else {
+				std::cerr << "PlainConnection::send(): Could not send data\n";
+				return ret;
+			}
 		}
+
+		// int ret = write(this->connection_socket_fd , msg.data(), msg.length());
+		// if (ret < 0) {
+		// 	std::cerr << "Could not send data.\n";
+		// 	this->disconnect();
+		// }
 		return ret;
 	}
 };
