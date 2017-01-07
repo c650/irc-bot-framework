@@ -73,4 +73,4 @@ Thanks to @nlohmann for his [C++ JSON Library](https://github.com/nlohmann/json)
 ---
 # License
 
-This project is licensed under the [Three-Clause BSD License](/LICENSE).
+This project is licensed under the [MIT License](/LICENSE).
