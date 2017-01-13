@@ -173,8 +173,8 @@ namespace Plugins {
 
 	class EliteCommand : protected IRC::CommandInterface {
 
-		const std::string reglr = "aeiolgsqtz";
-		const std::string elite = "4310195972";
+		const std::string reglr = "abeiolgsqtz";
+		const std::string elite = "48310195972";
 
 	public:
 
