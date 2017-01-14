@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
 	b.add_command( (IRC::CommandInterface*)( new Plugins::EliteCommand         ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::SlapCommand          ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::SpeakCommand         ));
+	b.add_command( (IRC::CommandInterface*)( new Plugins::ChooseCommand        ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::UtilityCommands(&b)  ));
 	b.add_command( (IRC::CommandInterface*)( new Plugins::RecoveryCommand(&b)  ));
 
