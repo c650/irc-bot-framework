@@ -248,7 +248,8 @@ namespace Plugins {
 
 			std::cout << "choices_vec.size() = " << choices_vec.size() << '\n';
 
-			p.reply(choices_vec.at( random_gen() % choices_vec.size() ) );
+			if ( !choices_vec.empty() )
+				p.reply(choices_vec.at( random_gen() % choices_vec.size() ) );
 		}
 
 	};
