@@ -227,6 +227,9 @@ namespace Plugins {
 		}
 
 		bool triggered(const IRC::Packet& p) {
+			if (p.content.length() < this->trigger_string.length())
+				return false;
+
 			std::string s = p.content.substr(0, this->trigger_string.length()-1);
 			return p.type == IRC::Packet::PacketType::PRIVMSG && !std::isalpha(s[0]) && !std::isdigit(s[0]) && s.substr(1) == this->trigger_string.substr(1, s.length()-1);
 		}
