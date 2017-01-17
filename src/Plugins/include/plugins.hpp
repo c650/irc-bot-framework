@@ -40,7 +40,7 @@ namespace Plugins {
 			this->times_executed++;
 		}
 
-		std::string get_stats(void) {
+		std::string get_stats(void) const {
 			return "GoogleCommand -> Times Executed: " + std::to_string(this->times_executed);
 		}
 
@@ -158,7 +158,7 @@ namespace Plugins {
 			this->queries_done++;
 		}
 
-		std::string get_stats(void) {
+		std::string get_stats(void) const {
 			return "Stock Queries Done: " + std::to_string(queries_done);
 		}
 

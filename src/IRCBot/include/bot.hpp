@@ -144,6 +144,15 @@ namespace IRC {
 		*/
 		void add_command( CommandInterface* cmd );
 
+		/*
+			Returns the vector of commands to the caller.
+
+			The commands are immutable.
+		*/
+		std::vector<const CommandInterface *> get_commands(void) const;
+		
+		std::vector<std::string> get_stats(void);
+
 		/* Reads from all connected servers and responds accordingly if
 			a trigger is found.
 		*/
@@ -181,8 +190,6 @@ namespace IRC {
 			Same as _is_admin but for ignored people
 		*/
 		bool _is_ignored(const std::string& person);
-
-		std::vector<std::string> get_stats(void);
 
 		void _listen_to_server(Server* s);
 

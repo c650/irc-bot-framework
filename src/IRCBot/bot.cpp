@@ -2,6 +2,8 @@
 #include "./include/packet.hpp"
 #include "./include/server.hpp"
 
+#include "./include/default-plugins.hpp"
+
 #include <thread>
 #include <mutex>
 
@@ -15,6 +17,12 @@ namespace IRC {
 		std::lock_guard<std::mutex> guard(this->admin_mutex); // just in case, because admins is a shared resource and should always be protected.
 		for (auto& a : _admins)
 			admins.push_back(a);
+
+		/* default commands about to make your life so much easier! */
+		this->add_command( (CommandInterface*)(new DefaultPlugins::Help(this, true)  ));
+		this->add_command( (CommandInterface*)(new DefaultPlugins::Help(this, false) ));
+		this->add_command( (CommandInterface*)(new DefaultPlugins::Statistics(this)  ));
+
 	}
 
 	Bot::~Bot() {
@@ -102,6 +110,22 @@ namespace IRC {
 		commands.push_back(cmd);
 	}
 
+	std::vector<const CommandInterface *> Bot::get_commands(void) const {
+		/* not using mutex here because this will be called from a command,
+			meaning that that thread owns the commands while this gets called.
+
+			Relocking mutex causes undefined behaviour.
+		*/
+
+		std::vector<const CommandInterface *> cmds;
+
+		for (auto c : this->commands) {
+			cmds.push_back(c);
+		}
+
+		return cmds;
+	}
+
 	void Bot::listen() {
 		std::vector<std::thread> threads;
 		for (Server* s : servers) {
@@ -160,28 +184,6 @@ namespace IRC {
 					i = p.content;
 			// not unlocking because Scope ends anyway.
 
-		} else if (p.type == Packet::PacketType::PRIVMSG && !sender_is_ignored) {
-
-			if (p.content.substr(0, 5) == "@help") {
-
-				std::lock_guard<std::mutex> guard(this->commands_mutex);
-				for (const auto command : this->commands) {
-					if (sender_is_admin || !command->requires_admin())
-						p.owner->privmsg(p.sender, command->trigger() + ": " + command->desc());
-				}
-				return;
-
-			} else if (p.content.substr(0, 6) == "@stats" && sender_is_admin) {
-
-				for (const auto& s : this->get_stats()) {
-					p.owner->privmsg(p.sender , s);
-				}
-
-				std::lock_guard<std::mutex> guard(this->commands_mutex);
-				for (const auto command : this->commands) {
-					p.owner->privmsg(p.sender, command->get_stats());
-				}
-			}
 		} else if (p.type == Packet::PacketType::INVITE && sender_is_admin) {
 			p.owner->join_channel( p.content );
 		} else if (p.type == Packet::PacketType::KICK) {
