@@ -13,13 +13,9 @@ namespace DefaultPlugins {
 
 	static void strip_string(std::string& s);
 
-	static std::string do_help_general(const std::vector<const IRC::CommandInterface*>& cmds, const bool requires_admin);
-	static std::string do_help_specific(const std::vector<const IRC::CommandInterface*>& cmds,
-										const bool requires_admin, const std::string& query);
-
 	class Help : protected IRC::CommandInterface {
 
-	public:
+	  public:
 		Help(IRC::Bot* b, bool ra) : CommandInterface("@help", "Helps users use bot.", b, ra) {}
 
 		void run(const IRC::Packet& p) {
@@ -29,15 +25,19 @@ namespace DefaultPlugins {
 			strip_string(content);
 
 			auto cmds = this->bot_ptr->get_commands();
-			std::string res = content.empty() ? do_help_general(cmds, this->req_admin) : do_help_specific(cmds, this->req_admin, content);
+			std::string res = content.empty() ? do_help_general(cmds) : do_help_specific(cmds, content);
 
 			p.owner->privmsg( p.sender , res );
 		}
+	  private:
+
+		std::string do_help_general(const std::vector<const IRC::CommandInterface*>& cmds);
+		std::string do_help_specific(const std::vector<const IRC::CommandInterface*>& cmds, const std::string& query);
 	};
 
 	class Statistics : protected IRC::CommandInterface {
 
-	public:
+	  public:
 		Statistics(IRC::Bot* b) : CommandInterface("@stats", "does stats", b, true) {}
 
 		void run(const IRC::Packet& p) {
@@ -55,29 +55,29 @@ namespace DefaultPlugins {
 
 	};
 
-	static std::string do_help_general(const std::vector<const IRC::CommandInterface*>& cmds, const bool requires_admin) {
+	std::string Help::do_help_general(const std::vector<const IRC::CommandInterface*>& cmds) {
 
 		std::string resp = "";
 		for (auto c : cmds) {
-			if (c->trigger() != "@help" && requires_admin == c->requires_admin()) {
+			if (c->trigger() != "@help" && this->req_admin == c->requires_admin()) {
 				resp += c->trigger() + ", ";
 			}
 		}
 
+		/* guaranteed to have at least 2 chars because of the ", " added above.*/
 		if (!resp.empty()) {
-			resp.pop_back();
+			resp.erase(resp.end() - 2, resp.end());
 		} else {
 			resp = "No commands installed!";
 		}
 		return resp;
 	}
 
-	static std::string do_help_specific(const std::vector<const IRC::CommandInterface*>& cmds,
-										const bool requires_admin, const std::string& query) {
+	std::string Help::do_help_specific(const std::vector<const IRC::CommandInterface*>& cmds, const std::string& query) {
 
 		bool found = false;
 		for (auto c : cmds) {
-			if (c->trigger().find(query) != std::string::npos && (found = true) && requires_admin == c->requires_admin()) {
+			if (c->trigger().find(query) != std::string::npos && (found = true) && this->req_admin == c->requires_admin()) {
 				return c->trigger() + " : " + c->desc();
 			}
 		}
