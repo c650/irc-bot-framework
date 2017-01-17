@@ -261,7 +261,7 @@ namespace Plugins {
 
 	  public:
 
-		UtilityCommands(IRC::Bot *b = nullptr) : IRC::CommandInterface("@kick,@join,@part,@quit,@nick,@adda", "does utility actions", b, true) {
+		UtilityCommands(IRC::Bot *b = nullptr) : IRC::CommandInterface("@kick, @join, @part, @quit, @nick, @adda", "does utility actions", b, true) {
 			if (b == nullptr) {
 				throw std::logic_error("In UtilityCommands, Bot *b cannot be nullptr!");
 			}
