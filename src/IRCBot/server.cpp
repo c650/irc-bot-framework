@@ -81,6 +81,8 @@ namespace IRC {
 	}
 
 	void Server::privmsg(const std::string& chan, const std::string& msg) const {
+		if (msg.empty())
+			return;
 		this->_send("\rPRIVMSG " + chan + " :" + msg + "\r\n");
 	}
 
@@ -90,7 +92,6 @@ namespace IRC {
 
 	/* helpers */
 	unsigned int Server::_send(const std::string& msg) const {
-		std::cout << "Sending: " << msg;
     	return this->connection->send(msg);
 	}
 

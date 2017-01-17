@@ -57,10 +57,12 @@ namespace DefaultPlugins {
 
 	std::string Help::do_help_general(const std::vector<const IRC::CommandInterface*>& cmds) {
 
-		std::string resp = "";
+		std::string resp = "", tmp;
 		for (auto c : cmds) {
 			if (c->trigger() != "@help" && this->req_admin == c->requires_admin()) {
-				resp += c->trigger() + ", ";
+				tmp = c->trigger();
+				strip_string(tmp);
+				resp += tmp + ", ";
 			}
 		}
 
