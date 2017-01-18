@@ -193,11 +193,11 @@ namespace Plugins {
 				msg = sub.substr(sub.find(" "));
 			} catch (std::exception& e) {
 				std::cerr << "EliteCommand::run() error: " << e.what() << '\n';
-				p.reply("Error. Usage: @1337 [to1337 | from1337] [message...]");
+				p.reply("Error. Usage: @1337 [to | from] [message...]");
 			}
 
 			sub = sub.substr(0, sub.find(" "));
-			if (sub == "from1337") {
+			if (sub == "from") {
 				for (auto& e : msg) {
 					for (size_t i = 0; i < elite.length(); ++i) {
 						if (std::tolower(e) == elite[i])
