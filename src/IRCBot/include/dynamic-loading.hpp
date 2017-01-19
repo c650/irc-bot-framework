@@ -12,6 +12,7 @@
 */
 
 #include "./command-interface.hpp"
+#include "./bot.hpp"
 
 namespace DynamicPluginLoading {
 
@@ -32,7 +33,7 @@ namespace DynamicPluginLoading {
 
 			Uses dlsym.
 		*/
-		IRC::CommandInterface* get_instance(void);
+		IRC::CommandInterface* get_instance(IRC::Bot * b);
 
 		std::string get_name(void) {
 			return name;

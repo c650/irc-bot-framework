@@ -2,6 +2,7 @@
 
 #include "./include/dynamic-loading.hpp"
 #include "./include/command-interface.hpp"
+#include "./include/bot.hpp"
 
 #include <stdexcept>
 #include <utility>
@@ -16,7 +17,7 @@ namespace DynamicPluginLoading {
 		close_plugin();
 	}
 
-	IRC::CommandInterface* DynamicPlugin::get_instance(void) {
+	IRC::CommandInterface* DynamicPlugin::get_instance(IRC::Bot *b) {
 
 		if (raw_handle == nullptr) {
 			throw std::runtime_error("There is no plugin to instantiate.");
@@ -28,7 +29,7 @@ namespace DynamicPluginLoading {
 
 		fptr func = reinterpret_cast<fptr>(reinterpret_cast<void*>(maker));
 
-		return func();
+		return func(b);
 	}
 
 	void DynamicPlugin::load_plugin(void) {
