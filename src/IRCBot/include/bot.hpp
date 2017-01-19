@@ -16,6 +16,7 @@
 #include "./command-interface.hpp"
 #include "./server.hpp"
 #include "./packet.hpp"
+#include "./dynamic-loading.hpp"
 
 namespace IRC {
 
@@ -30,6 +31,7 @@ namespace IRC {
 		std::vector< Server* > servers;
 
 		std::vector<CommandInterface*> commands;
+		std::vector<DynamicPluginLoading::DynamicPlugin*> dynamic_plugins;
 
 		std::string recovery_password_sha256;
 
@@ -40,7 +42,8 @@ namespace IRC {
 		std::mutex stat_mutex,
 		           admin_mutex,
 		           ignored_mutex,
-				   commands_mutex;
+				   commands_mutex,
+				   dynamic_plugins_mutex;
 				   // A servers_mutex is not needed since each server occupies its own thread and shares no data.
 
 	public:
@@ -144,13 +147,16 @@ namespace IRC {
 		*/
 		void add_command( CommandInterface* cmd );
 
+		void add_dynamic_command( DynamicPluginLoading::DynamicPlugin* plugin );
+
+		void remove_dynamic_command( const std::string& name );
+
 		/*
 			Returns the vector of commands to the caller.
 
 			The commands are immutable.
 		*/
 		std::vector<const CommandInterface *> get_commands(void) const;
-		
 		std::vector<std::string> get_stats(void);
 
 		/* Reads from all connected servers and responds accordingly if

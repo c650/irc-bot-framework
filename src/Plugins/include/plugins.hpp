@@ -87,17 +87,6 @@ namespace Plugins {
 		}
 	};
 
-	class SayHiCommand : protected IRC::CommandInterface {
-
-	  public:
-
-		SayHiCommand() : IRC::CommandInterface("@sayhi", "says hi.") {}
-
-		void run(const IRC::Packet& p) {
-			p.reply("Hello!");
-		}
-	};
-
 	class SlapCommand : protected IRC::CommandInterface {
 
 	  public:

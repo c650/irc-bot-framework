@@ -4,6 +4,8 @@
 
 #include "./include/default-plugins.hpp"
 
+#include "./include/dynamic-loading.hpp"
+
 #include <thread>
 #include <mutex>
 
@@ -21,6 +23,7 @@ namespace IRC {
 		/* default commands about to make your life so much easier! */
 		this->add_command( (CommandInterface*)(new DefaultPlugins::Help(this, true)  ));
 		this->add_command( (CommandInterface*)(new DefaultPlugins::Help(this, false) ));
+		this->add_command( (CommandInterface*)(new DefaultPlugins::Loader(this)      ));
 		this->add_command( (CommandInterface*)(new DefaultPlugins::Statistics(this)  ));
 
 	}
@@ -35,6 +38,12 @@ namespace IRC {
 		for (CommandInterface* c : commands) {
 			if (c)
 				delete c;
+		}
+
+		std::lock_guard<std::mutex> guard2( this->dynamic_plugins_mutex );
+		for (auto d : dynamic_plugins) {
+			if (d)
+				delete d;
 		}
 	}
 
@@ -108,6 +117,32 @@ namespace IRC {
 
 		std::lock_guard<std::mutex> guard(this->commands_mutex);
 		commands.push_back(cmd);
+	}
+
+	void Bot::add_dynamic_command( DynamicPluginLoading::DynamicPlugin* plugin ) {
+
+		this->commands.push_back( plugin->get_instance() );
+
+		std::lock_guard<std::mutex> guard( this->dynamic_plugins_mutex );
+		this->dynamic_plugins.push_back( plugin );
+	}
+
+	void Bot::remove_dynamic_command( const std::string& name ) {
+
+		std::lock_guard<std::mutex> guard( this->dynamic_plugins_mutex );
+
+		for ( size_t i = 0; i < this->dynamic_plugins.size(); ++i ) {
+			if (this->dynamic_plugins[i]->get_name() == name) {
+				std::swap( this->dynamic_plugins[i] , this->dynamic_plugins.back());
+
+				delete this->dynamic_plugins.back();
+				this->dynamic_plugins.pop_back();
+
+				return;
+			}
+		}
+
+		throw std::runtime_error("No such plugin could be removed: " + name);
 	}
 
 	std::vector<const CommandInterface *> Bot::get_commands(void) const {

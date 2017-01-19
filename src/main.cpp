@@ -1,7 +1,7 @@
 #include "./Plugins/include/environment.hpp"
 
 #include "./Plugins/include/json.hpp" /* from https://github.com/nlohmann/json */
-#include "./Plugins/include/plugins.hpp"
+// #include "./Plugins/include/plugins.hpp"
 
 #include "./IRCBot/include/bot.hpp"
 #include "./IRCBot/include/packet.hpp"
@@ -47,25 +47,25 @@ int main(int argc, char **argv) {
 		std::cerr << "Nobody to ignore.\n";
 	}
 
-	b.add_command( (IRC::CommandInterface*)( new Plugins::SayHiCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::GoogleCommand        ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::LMGTFYCommand        ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::UrbanCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::IPLookupCommand      ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::StocksCommand        ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::QuoteCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::EliteCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::SlapCommand          ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::SpeakCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::ChooseCommand        ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::UtilityCommands(&b)  ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::RecoveryCommand(&b)  ));
-
-	try {
-		b.add_command( (IRC::CommandInterface*)(new Plugins::BabblerCommand( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );
-	} catch (...) {
-		std::cerr << "Failed to add Babbler\n";
-	}
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::SayHiCommand         ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::GoogleCommand        ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::LMGTFYCommand        ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::UrbanCommand         ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::IPLookupCommand      ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::StocksCommand        ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::QuoteCommand         ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::EliteCommand         ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::SlapCommand          ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::SpeakCommand         ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::ChooseCommand        ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::UtilityCommands(&b)  ));
+	// b.add_command( (IRC::CommandInterface*)( new Plugins::RecoveryCommand(&b)  ));
+	//
+	// try {
+	// 	b.add_command( (IRC::CommandInterface*)(new Plugins::BabblerCommand( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );
+	// } catch (...) {
+	// 	std::cerr << "Failed to add Babbler\n";
+	// }
 
 	/* Add a server and connect to it by name */
 	/* SSL is used by default. To disable it, pass `false` in place of the with_ssl arg. */

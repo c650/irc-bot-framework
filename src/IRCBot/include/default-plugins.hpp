@@ -4,14 +4,58 @@
 #include "./command-interface.hpp"
 #include "./bot.hpp"
 
+#include "./dynamic-loading.hpp" /* for Loader */
+
 #include <string>
 #include <vector>
 
 #include <iostream>
+#include <stdexcept>
 
 namespace DefaultPlugins {
 
 	static void strip_string(std::string& s);
+
+	class Loader : protected IRC::CommandInterface {
+
+	public:
+
+		Loader(IRC::Bot *b) : CommandInterface("@load", "load or unload a module", b, true) {}
+
+		bool triggered(const IRC::Packet& p) {
+			if (p.type == IRC::Packet::PacketType::PRIVMSG && p.content.length() >= this->trigger_string.length()) {
+				std::string s = p.content.substr(1 , p.content.find(" ") - 1);
+				return s == "load" || s == "unload";
+			}
+			return false;
+		}
+
+		void run(const IRC::Packet& p) {
+
+			std::string command = "";
+			try {
+				command = p.content.substr(1);
+				std::string arg = command.substr(command.find(" ") + 1);
+
+				command = command.substr(0, command.find(" "));
+
+				if (command == "load") {
+					this->bot_ptr->add_dynamic_command( new DynamicPluginLoading::DynamicPlugin( arg ) );
+				} else if (command == "unload") {
+					this->bot_ptr->remove_dynamic_command( arg );
+				}
+
+				p.reply("Success.");
+
+			} catch (std::exception& e) {
+				std::string ret = "Could not load! Command passed: " + command;
+
+				p.reply(ret);
+				std::cerr << ret << " " << e.what() << '\n';
+			}
+		}
+
+	};
 
 	class Help : protected IRC::CommandInterface {
 
