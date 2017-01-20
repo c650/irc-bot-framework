@@ -39,3 +39,11 @@ static std::string get_random_quote(void) {
 	}
 	return "Couldn't grab a quote!";
 }
+
+extern "C" {
+
+	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+		return (IRC::CommandInterface*)(new QuoteCommand);
+	}
+
+};
