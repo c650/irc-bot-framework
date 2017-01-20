@@ -1,7 +1,6 @@
 #include "../IRCBot/include/command-interface.hpp"
 #include "../IRCBot/include/bot.hpp"
 
-#include "./include/stocks.hpp"
 #include "./include/http.hpp"
 #include "./include/json.hpp"
 
