@@ -40,7 +40,17 @@ namespace DefaultPlugins {
 				command = command.substr(0, command.find(" "));
 
 				if (command == "load") {
-					this->bot_ptr->add_dynamic_command( new DynamicPluginLoading::DynamicPlugin( arg ) );
+
+					try {
+						this->bot_ptr->add_dynamic_command( new DynamicPluginLoading::DynamicPlugin( arg ) );
+					} catch (std::exception& e) {
+						std::string ret = "Could not load: " + arg;
+						p.reply( ret );
+						std::cerr << ret << " " << e.what() << '\n';
+
+						return;
+					}
+
 				} else if (command == "unload") {
 					this->bot_ptr->remove_dynamic_command( arg );
 				}

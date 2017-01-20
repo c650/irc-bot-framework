@@ -28,6 +28,10 @@ namespace DynamicPluginLoading {
 
 		void *maker = dlsym(raw_handle , "maker");
 
+		if (maker == nullptr) {
+			throw std::runtime_error("No maker() factory function is present!");
+		}
+
 		typedef IRC::CommandInterface* (*fptr)(IRC::Bot*);
 
 		fptr func = reinterpret_cast<fptr>(reinterpret_cast<void*>(maker));
