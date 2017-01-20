@@ -1,7 +1,3 @@
-/*
-	sayhi.cpp
-*/
-
 #include "../IRCBot/include/command-interface.hpp"
 #include "../IRCBot/include/bot.hpp"
 #include "../IRCBot/include/packet.hpp"
@@ -69,7 +65,7 @@ class UtilityCommands : protected IRC::CommandInterface {
 
 extern "C" {
 
-	IRC::CommandInterface* maker(IRC::Bot *b = nullptr) {
+	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
 		return (IRC::CommandInterface*)(new UtilityCommands(b));
 	}
 

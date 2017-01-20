@@ -2,6 +2,7 @@
 
 #include "./include/dynamic-loading.hpp"
 #include "./include/command-interface.hpp"
+#include "./include/bot.hpp"
 
 #include <stdexcept>
 #include <utility>
