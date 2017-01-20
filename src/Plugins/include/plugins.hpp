@@ -59,23 +59,6 @@ namespace Plugins {
 
 	};
 
-	class UrbanCommand : protected IRC::CommandInterface {
-
-	public:
-
-		UrbanCommand()
-			: CommandInterface("@urban ", "checks urban dictionary for a definition.") {}
-
-		void run(const IRC::Packet& p) {
-			std::string def = "";
-			Urban::get_first_result(p.content.substr(this->trigger_string.length()) , def);
-			if (!def.empty()) {
-				p.reply(def);
-			}
-		}
-
-	};
-
 	class IPLookupCommand : protected IRC::CommandInterface {
 
 	  public:

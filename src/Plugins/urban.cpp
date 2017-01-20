@@ -1,39 +1,66 @@
-#include "./include/urban.hpp"
+#include "../IRCBot/include/command-interface.hpp"
+#include "../IRCBot/include/bot.hpp"
+#include "../IRCBot/include/packet.hpp"
+
 #include "./include/http.hpp"
 #include "./include/json.hpp"
 
 #include <string>
 #include <stdexcept>
 
-namespace Urban {
+static void strip_line_endings(std::string& str);
+static void get_first_result(const std::string& query, std::string& res);
 
-	static void strip_line_endings(std::string& str);
+class UrbanCommand : protected IRC::CommandInterface {
 
-	void get_first_result(const std::string& query, std::string& res) {
+  public:
 
-		std::string response = "";
-		if ( !MyHTTP::get("http://api.urbandictionary.com/v0/define?term=" + MyHTTP::uri_encode(query) , response ) ) {
-			res = "";
-			return;
-		}
+	UrbanCommand()
+		: CommandInterface("@urban ", "checks urban dictionary for a definition.") {}
 
-		try {
-			nlohmann::json data = nlohmann::json::parse(response);
-			if (data["result_type"] == "exact") {
-				res = data["list"].at(0)["definition"];
-				strip_line_endings(res);
-			}
-		} catch (std::exception& e) {
-			std::cerr << "Failed in Urban::get_first_result: " << e.what() << '\n';
-			res = "";
+	void run(const IRC::Packet& p) {
+		std::string def = "";
+
+		get_first_result(p.content.substr(this->trigger_string.length()) , def);
+
+		if (!def.empty()) {
+			p.reply(def);
 		}
 	}
 
-	static void strip_line_endings(std::string& str) {
-		size_t loc = 0;
-		while ( (loc = str.find("\r\n", loc) ) != std::string::npos) {
-			str.replace(loc, 2, " ");
+};
+
+static void get_first_result(const std::string& query, std::string& res) {
+
+	std::string response = "";
+	if ( !MyHTTP::get("http://api.urbandictionary.com/v0/define?term=" + MyHTTP::uri_encode(query) , response ) ) {
+		res = "";
+		return;
+	}
+
+	try {
+		nlohmann::json data = nlohmann::json::parse(response);
+		if (data["result_type"] == "exact") {
+			res = data["list"].at(0)["definition"];
+			strip_line_endings(res);
 		}
+	} catch (std::exception& e) {
+		std::cerr << "Failed in Urban::get_first_result: " << e.what() << '\n';
+		res = "";
+	}
+}
+
+static void strip_line_endings(std::string& str) {
+	size_t loc = 0;
+	while ( (loc = str.find("\r\n", loc) ) != std::string::npos) {
+		str.replace(loc, 2, " ");
+	}
+}
+
+extern "C" {
+
+	IRC::CommandInterface* maker(IRC::Bot *b = nullptr) {
+		return (IRC::CommandInterface*)(new UrbanCommand);
 	}
 
 };
