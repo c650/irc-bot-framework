@@ -122,15 +122,11 @@ namespace IRC {
 
 	void Bot::add_dynamic_command( DynamicPluginLoading::DynamicPlugin* plugin ) {
 
-<<<<<<< HEAD
 		try {
 			this->commands.push_back( plugin->get_instance( this ) );
 		} catch (std::exception& e) {
 			throw std::runtime_error(e.what());
 		}
-=======
-		this->commands.push_back( plugin->get_instance(this) );
->>>>>>> 6dad7aef7121520652f124a30bada37239c02c4d
 
 		std::lock_guard<std::mutex> guard( this->dynamic_plugins_mutex );
 		this->dynamic_plugins.push_back( plugin );
