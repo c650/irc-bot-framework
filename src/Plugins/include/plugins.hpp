@@ -59,17 +59,6 @@ namespace Plugins {
 
 	};
 
-	class IPLookupCommand : protected IRC::CommandInterface {
-
-	  public:
-
-		IPLookupCommand() : IRC::CommandInterface("@iplookup ", "looks up IP address.", nullptr, true) {}
-
-		void run(const IRC::Packet& p) {
-			p.reply(IPLookup::do_lookup(p.content.substr(this->trigger().length())));
-		}
-	};
-
 	class SlapCommand : protected IRC::CommandInterface {
 
 	  public:
