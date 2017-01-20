@@ -14,6 +14,7 @@
 #include "./types.hpp"
 
 #include <string>
+#include <vector>
 
 namespace DynamicPluginLoading {
 
@@ -21,6 +22,8 @@ namespace DynamicPluginLoading {
 
 		void *raw_handle; // handle for use by dl functions.
 		std::string name; // filepath to plugin.
+
+		std::vector<IRC::CommandInterface*> instances;
 
 	public:
 
@@ -39,6 +42,8 @@ namespace DynamicPluginLoading {
 		std::string get_name(void) {
 			return name;
 		}
+
+		bool provides_instance_of(IRC::CommandInterface* cptr);
 
 	private:
 

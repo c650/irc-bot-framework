@@ -14,6 +14,10 @@ namespace DynamicPluginLoading {
 
 	DynamicPlugin::~DynamicPlugin() {
 		close_plugin();
+
+		/* note that any cached instances are not deleted here
+			because they were passed to bots who should handle the
+			deletions. */
 	}
 
 	IRC::CommandInterface* DynamicPlugin::get_instance(IRC::Bot * bot) {
@@ -28,7 +32,9 @@ namespace DynamicPluginLoading {
 
 		fptr func = reinterpret_cast<fptr>(reinterpret_cast<void*>(maker));
 
-		return func(bot);
+		this->instances.push_back(func(bot)); /* cache here to deallocate responsibly. */
+
+		return this->instances.back();
 	}
 
 	void DynamicPlugin::load_plugin(void) {
@@ -41,6 +47,15 @@ namespace DynamicPluginLoading {
 		if ( dlclose(raw_handle) != 0 ) {
 			throw std::runtime_error("There was a problem closing: " + name);
 		}
+	}
+
+	bool DynamicPlugin::provides_instance_of(IRC::CommandInterface* cptr) {
+		for (auto c : instances) {
+			if (c == cptr) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 };

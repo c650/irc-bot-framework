@@ -103,7 +103,7 @@ namespace DefaultPlugins {
 
 		std::string resp = "", tmp;
 		for (auto c : cmds) {
-			if (c->trigger() != "@help" && this->req_admin == c->requires_admin()) {
+			if (c->trigger() != "@help" && (!c->requires_admin() || this->req_admin)) {
 				tmp = c->trigger();
 				strip_string(tmp);
 				resp += tmp + ", ";
@@ -123,7 +123,8 @@ namespace DefaultPlugins {
 
 		bool found = false;
 		for (auto c : cmds) {
-			if (c->trigger().find(query) != std::string::npos && (found = true) && this->req_admin == c->requires_admin()) {
+			std::cout << c->trigger() << '\n';
+			if (c->trigger().find(query) != std::string::npos && (found = true) && (!c->requires_admin() || this->req_admin)) {
 				return c->trigger() + " : " + c->desc();
 			}
 		}
