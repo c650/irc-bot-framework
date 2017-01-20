@@ -32,7 +32,7 @@ namespace DynamicPluginLoading {
 	}
 
 	void DynamicPlugin::load_plugin(void) {
-		if ( (raw_handle = dlopen( name.data() , RTLD_LAZY )) == nullptr ) {
+		if ( (raw_handle = dlopen( name.data() , RTLD_NOW )) == nullptr ) {
 			throw std::runtime_error("Could not open " + name + ": " + dlerror());
 		}
 	}
