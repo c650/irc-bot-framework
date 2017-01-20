@@ -20,7 +20,6 @@
 
 namespace Plugins {
 
-
 	class GoogleCommand : protected IRC::CommandInterface {
 
 		unsigned long long times_executed;
@@ -46,51 +45,6 @@ namespace Plugins {
 
 	};
 
-	class LMGTFYCommand : protected IRC::CommandInterface {
-
-	  public:
-
-		LMGTFYCommand()
-			: CommandInterface("@lmgtfy ", "mean way to tell ppl to google things.") {}
-
-		void run(const IRC::Packet& p) {
-			p.reply("http://lmgtfy.com/?q=" + MyHTTP::uri_encode( p.content.substr(this->trigger().length()) ) );
-		}
-
-	};
-
-	class SlapCommand : protected IRC::CommandInterface {
-
-	  public:
-
-		SlapCommand() : IRC::CommandInterface("@slap ", "slaps arguments.") {}
-
-		void run(const IRC::Packet& p) {
-			p.reply("\001ACTION slapped the hell outta " + p.content.substr(this->trigger().length()) + "\001");
-		}
-
-	};
-
-	class SpeakCommand : protected IRC::CommandInterface {
-
-	  public:
-
-		SpeakCommand() : IRC::CommandInterface("@speak ", "says a message to channel: @speak <chan> <msg...>", nullptr, true) {}
-
-		void run(const IRC::Packet& p) {
-			std::string arguments = p.content.substr(this->trigger().length()); // everything after "@speak "
-
-			size_t first_space_idx = arguments.find(" ");
-			if (first_space_idx == std::string::npos)
-				return;
-			std::string chan = arguments.substr(0, first_space_idx);
-			std::string msg = arguments.substr(first_space_idx	+ 1);
-
-			p.owner->privmsg( chan , msg );
-		}
-
-	};
-
 	class BabblerCommand : protected IRC::CommandInterface {
 
 		RandomLineStream rls;
@@ -102,17 +56,6 @@ namespace Plugins {
 
 		void run(const IRC::Packet& p) {
 			p.reply(rls.sample());
-		}
-
-	};
-
-	class QuoteCommand : protected IRC::CommandInterface {
-
-	  public:
-		QuoteCommand() : CommandInterface("@quote", "delivers the quote of the day.") {}
-
-		void run(const IRC::Packet& p) {
-			p.reply(Quotes::get_random_quote());
 		}
 
 	};
