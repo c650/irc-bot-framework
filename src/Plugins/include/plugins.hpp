@@ -106,25 +106,6 @@ namespace Plugins {
 
 	};
 
-	class StocksCommand : protected IRC::CommandInterface {
-
-		unsigned long long queries_done;
-
-	  public:
-
-		StocksCommand() : CommandInterface("@stock ", "checks a stock ticker price."), queries_done(0) {}
-
-		void run(const IRC::Packet& p) {
-			p.reply(Stocks::get_stock_summary( p.content.substr(this->trigger().length()) ));
-			this->queries_done++;
-		}
-
-		std::string get_stats(void) const {
-			return "Stock Queries Done: " + std::to_string(queries_done);
-		}
-
-	};
-
 	class QuoteCommand : protected IRC::CommandInterface {
 
 	  public:
