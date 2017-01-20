@@ -16,7 +16,7 @@ namespace DynamicPluginLoading {
 		close_plugin();
 	}
 
-	IRC::CommandInterface* DynamicPlugin::get_instance(void) {
+	IRC::CommandInterface* DynamicPlugin::get_instance(IRC::Bot * bot) {
 
 		if (raw_handle == nullptr) {
 			throw std::runtime_error("There is no plugin to instantiate.");
@@ -24,11 +24,11 @@ namespace DynamicPluginLoading {
 
 		void *maker = dlsym(raw_handle , "maker");
 
-		typedef IRC::CommandInterface* (*fptr)();
+		typedef IRC::CommandInterface* (*fptr)(IRC::Bot*);
 
 		fptr func = reinterpret_cast<fptr>(reinterpret_cast<void*>(maker));
 
-		return func();
+		return func(bot);
 	}
 
 	void DynamicPlugin::load_plugin(void) {

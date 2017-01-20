@@ -19,7 +19,7 @@ class SayHiCommand : protected IRC::CommandInterface {
 
 extern "C" {
 
-	IRC::CommandInterface* maker(void) {
+	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
 		return (IRC::CommandInterface*)(new SayHiCommand);
 	}
 
