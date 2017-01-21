@@ -37,6 +37,23 @@ namespace DefaultPlugins {
 				command = p.content.substr(1);
 				std::string arg = command.substr(command.find(" ") + 1);
 
+				if ( arg.find("-list") != std::string::npos) {
+
+					std::string list_of_libs = "";
+					this->bot_ptr->each_dynamic_plugin([&list_of_libs](const DynamicPluginLoading::DynamicPlugin * d){
+						list_of_libs += d->get_name() + ", ";
+					});
+					if (!list_of_libs.empty()) {
+						list_of_libs.erase(list_of_libs.end()-2, list_of_libs.end());
+					} else {
+						list_of_libs = "There are no dynamically loaded plugins at the moment.";
+					}
+
+					p.reply(list_of_libs);
+
+					return;
+				}
+
 				command = command.substr(0, command.find(" "));
 
 				if (command == "load") {
@@ -78,15 +95,14 @@ namespace DefaultPlugins {
 
 			strip_string(content);
 
-			auto cmds = this->bot_ptr->get_commands();
-			std::string res = content.empty() ? do_help_general(cmds) : do_help_specific(cmds, content);
+			std::string res = content.empty() ? do_help_general() : do_help_specific(content);
 
 			p.owner->privmsg( p.sender , res );
 		}
 	  private:
 
-		std::string do_help_general(const std::vector<const IRC::CommandInterface*>& cmds);
-		std::string do_help_specific(const std::vector<const IRC::CommandInterface*>& cmds, const std::string& query);
+		std::string do_help_general(void);
+		std::string do_help_specific(const std::string& query);
 	};
 
 	class Statistics : protected IRC::CommandInterface {
@@ -100,25 +116,25 @@ namespace DefaultPlugins {
 			}
 
 			std::string tmp = "";
-			for (auto command : this->bot_ptr->get_commands()) {
+			this->bot_ptr->each_command([&tmp, &p](IRC::CommandInterface* command){
 				tmp = command->get_stats();
 				if (!tmp.empty())
 					p.owner->privmsg(p.sender, tmp);
-			}
+			});
 		}
 
 	};
 
-	std::string Help::do_help_general(const std::vector<const IRC::CommandInterface*>& cmds) {
+	std::string Help::do_help_general(void) {
 
 		std::string resp = "", tmp;
-		for (auto c : cmds) {
+		this->bot_ptr->each_command([&resp, this, &tmp](IRC::CommandInterface* c) {
 			if (c->trigger() != "@help" && (!c->requires_admin() || this->req_admin)) {
 				tmp = c->trigger();
 				strip_string(tmp);
 				resp += tmp + ", ";
 			}
-		}
+		});
 
 		/* guaranteed to have at least 2 chars because of the ", " added above.*/
 		if (!resp.empty()) {
@@ -129,15 +145,15 @@ namespace DefaultPlugins {
 		return resp;
 	}
 
-	std::string Help::do_help_specific(const std::vector<const IRC::CommandInterface*>& cmds, const std::string& query) {
+	std::string Help::do_help_specific(const std::string& query) {
 
 		bool found = false;
-		for (auto c : cmds) {
+		this->bot_ptr->each_command([this, &query, &found](IRC::CommandInterface* c) {
 			std::cout << c->trigger() << '\n';
 			if (c->trigger().find(query) != std::string::npos && (found = true) && (!c->requires_admin() || this->req_admin)) {
 				return c->trigger() + " : " + c->desc();
 			}
-		}
+		});
 		return found ? "" : "[ERROR] Couldn't find " + query;
 	}
 

@@ -54,7 +54,7 @@ namespace DynamicPluginLoading {
 		}
 	}
 
-	bool DynamicPlugin::provides_instance_of(IRC::CommandInterface* cptr) {
+	bool DynamicPlugin::provides_instance_of(const IRC::CommandInterface* cptr) const {
 		for (auto c : instances) {
 			if (c == cptr) {
 				return true;

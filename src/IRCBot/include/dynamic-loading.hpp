@@ -39,11 +39,11 @@ namespace DynamicPluginLoading {
 		*/
 		IRC::CommandInterface* get_instance(IRC::Bot * b);
 
-		std::string get_name(void) {
+		std::string get_name(void) const {
 			return name;
 		}
 
-		bool provides_instance_of(IRC::CommandInterface* cptr);
+		bool provides_instance_of(const IRC::CommandInterface* cptr) const;
 
 	private:
 

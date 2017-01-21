@@ -167,22 +167,6 @@ namespace IRC {
 		throw std::runtime_error("No such plugin could be removed: " + name);
 	}
 
-	std::vector<const CommandInterface *> Bot::get_commands(void) const {
-		/* not using mutex here because this will be called from a command,
-			meaning that that thread owns the commands while this gets called.
-
-			Relocking mutex causes undefined behaviour.
-		*/
-
-		std::vector<const CommandInterface *> cmds;
-
-		for (auto c : this->commands) {
-			cmds.push_back(c);
-		}
-
-		return cmds;
-	}
-
 	void Bot::listen() {
 		std::vector<std::thread> threads;
 		for (Server* s : servers) {

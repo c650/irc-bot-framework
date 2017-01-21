@@ -171,12 +171,20 @@ namespace IRC {
 		*/
 		void remove_dynamic_command( const std::string& name );
 
-		/*
-			Returns the vector of commands to the caller.
+		template<class Func>
+		void each_command(Func f) const {
+			for (auto c : this->commands) {
+				f(c);
+			}
+		}
 
-			The commands are immutable.
-		*/
-		std::vector<const CommandInterface *> get_commands(void) const;
+		template<class Func>
+		void each_dynamic_plugin(Func f) const {
+			for (auto c : this->dynamic_plugins) {
+				f(c);
+			}
+		}
+
 		std::vector<std::string> get_stats(void);
 
 		/* Reads from all connected servers and responds accordingly if
