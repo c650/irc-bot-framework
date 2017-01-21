@@ -147,8 +147,28 @@ namespace IRC {
 		*/
 		void add_command( CommandInterface* cmd );
 
-		void add_dynamic_command( DynamicPluginLoading::DynamicPlugin* plugin );
+		/*
+			Adds the dynamic command located at the path (absolute or relative)
+				`name`.
 
+			@param name the path/name of the shared library (.so) to dynamically
+			load into the bot.
+
+			This method also loads an instance of the shared library's implementation
+			of IRC::CommandInterface into this->commands.
+		*/
+		void add_dynamic_command( const std::string& name );
+
+		/*
+			Removes the dynamic command stored in dynamic_plugins
+			with the name `name`.
+
+			@param name the path/name of the shared lib (.so) to dynamically
+			unload from the bot.
+
+			Note that this method also deletes and removes any commands that
+			were instantiated using code from the `name` lib.
+		*/
 		void remove_dynamic_command( const std::string& name );
 
 		/*

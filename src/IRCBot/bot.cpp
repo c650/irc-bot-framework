@@ -120,16 +120,16 @@ namespace IRC {
 		commands.push_back(cmd);
 	}
 
-	void Bot::add_dynamic_command( DynamicPluginLoading::DynamicPlugin* plugin ) {
-
+	void Bot::add_dynamic_command( const std::string& name ) {
 		try {
+			DynamicPluginLoading::DynamicPlugin* plugin = new DynamicPluginLoading::DynamicPlugin( name );
 			this->commands.push_back( plugin->get_instance( this ) );
+
+			std::lock_guard<std::mutex> guard( this->dynamic_plugins_mutex );
+			this->dynamic_plugins.push_back( plugin );
 		} catch (std::exception& e) {
 			throw std::runtime_error(e.what());
 		}
-
-		std::lock_guard<std::mutex> guard( this->dynamic_plugins_mutex );
-		this->dynamic_plugins.push_back( plugin );
 	}
 
 	void Bot::remove_dynamic_command( const std::string& name ) {

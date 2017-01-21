@@ -42,7 +42,7 @@ namespace DefaultPlugins {
 				if (command == "load") {
 
 					try {
-						this->bot_ptr->add_dynamic_command( new DynamicPluginLoading::DynamicPlugin( arg ) );
+						this->bot_ptr->add_dynamic_command( arg );
 					} catch (std::exception& e) {
 						std::string ret = "Could not load: " + arg;
 						p.reply( ret );
