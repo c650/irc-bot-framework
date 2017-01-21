@@ -1,7 +1,7 @@
 #include "./Plugins/include/environment.hpp"
 
 #include "./Plugins/include/json.hpp" /* from https://github.com/nlohmann/json */
-#include "./Plugins/include/plugins.hpp"
+// #include "./Plugins/include/plugins.hpp"
 
 #include "./IRCBot/include/bot.hpp"
 #include "./IRCBot/include/packet.hpp"
@@ -47,24 +47,26 @@ int main(int argc, char **argv) {
 		std::cerr << "Nobody to ignore.\n";
 	}
 
-	b.add_command( (IRC::CommandInterface*)( new Plugins::SayHiCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::GoogleCommand        ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::LMGTFYCommand        ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::UrbanCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::IPLookupCommand      ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::StocksCommand        ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::QuoteCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::EliteCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::SlapCommand          ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::SpeakCommand         ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::ChooseCommand        ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::UtilityCommands(&b)  ));
-	b.add_command( (IRC::CommandInterface*)( new Plugins::RecoveryCommand(&b)  ));
-
+	std::string prefix;
 	try {
-		b.add_command( (IRC::CommandInterface*)(new Plugins::BabblerCommand( ENVIRONMENT["babble"]["filepath"].get<std::string>() ) ) );
+		prefix = ENVIRONMENT["bot"]["dynamic_lib_path_prefix"].get<std::string>();
 	} catch (...) {
-		std::cerr << "Failed to add Babbler\n";
+		std::cerr << "Couldn't load a prefix. Defaulting to current directory.\n";
+		prefix = "./";
+	}
+	try {
+		for (auto& lib : ENVIRONMENT["bot"]["dynamic_commands"]) {
+			try {
+				std::string name = prefix + lib.get<std::string>() + ".so";
+				std::cout << "Attempting to load: " << name << " ... ";
+				b.add_dynamic_command( name );
+				std::cout << "Loaded!\n";
+			} catch (std::exception& e) {
+				std::cerr << "Fail!\n\t" << e.what() << '\n';
+			}
+		}
+	} catch (...) {
+		std::cout << "[!] No dynamic commands specified in config file.\n";
 	}
 
 	/* Add a server and connect to it by name */

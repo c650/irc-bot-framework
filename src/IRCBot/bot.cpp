@@ -4,8 +4,11 @@
 
 #include "./include/default-plugins.hpp"
 
+#include "./include/dynamic-loading.hpp"
+
 #include <thread>
 #include <mutex>
+#include <algorithm>
 
 namespace IRC {
 
@@ -21,6 +24,7 @@ namespace IRC {
 		/* default commands about to make your life so much easier! */
 		this->add_command( (CommandInterface*)(new DefaultPlugins::Help(this, true)  ));
 		this->add_command( (CommandInterface*)(new DefaultPlugins::Help(this, false) ));
+		this->add_command( (CommandInterface*)(new DefaultPlugins::Loader(this)      ));
 		this->add_command( (CommandInterface*)(new DefaultPlugins::Statistics(this)  ));
 
 	}
@@ -35,6 +39,12 @@ namespace IRC {
 		for (CommandInterface* c : commands) {
 			if (c)
 				delete c;
+		}
+
+		std::lock_guard<std::mutex> guard2( this->dynamic_plugins_mutex );
+		for (auto d : dynamic_plugins) {
+			if (d)
+				delete d;
 		}
 	}
 
@@ -110,20 +120,51 @@ namespace IRC {
 		commands.push_back(cmd);
 	}
 
-	std::vector<const CommandInterface *> Bot::get_commands(void) const {
-		/* not using mutex here because this will be called from a command,
-			meaning that that thread owns the commands while this gets called.
+	void Bot::add_dynamic_command( const std::string& name ) {
+		try {
+			DynamicPluginLoading::DynamicPlugin* plugin = new DynamicPluginLoading::DynamicPlugin( name );
+			this->commands.push_back( plugin->get_instance( this ) );
 
-			Relocking mutex causes undefined behaviour.
-		*/
+			std::lock_guard<std::mutex> guard( this->dynamic_plugins_mutex );
+			this->dynamic_plugins.push_back( plugin );
+		} catch (std::exception& e) {
+			throw std::runtime_error(e.what());
+		}
+	}
 
-		std::vector<const CommandInterface *> cmds;
+	void Bot::remove_dynamic_command( const std::string& name ) {
 
-		for (auto c : this->commands) {
-			cmds.push_back(c);
+		std::lock_guard<std::mutex> guard( this->dynamic_plugins_mutex );
+
+		for ( size_t i = 0; i < this->dynamic_plugins.size(); ++i ) {
+			if (this->dynamic_plugins[i]->get_name() == name) {
+
+				std::cout << "remove_dynamic_command() removing: " << this->dynamic_plugins[i]->get_name() << "\n";
+
+				std::swap( this->dynamic_plugins[i] , this->dynamic_plugins.back());
+
+				/* considering that this function is called from the loader we already have a lock over the commands mutex. */
+				this->commands.resize(
+					std::distance(this->commands.begin() , std::remove_if(this->commands.begin(), this->commands.end(), [this](IRC::CommandInterface* c){
+
+					if (this->dynamic_plugins.back()->provides_instance_of(c) ) {
+						std::cout << "\tFound " << c << "\n";
+						delete c;
+						return true;
+					}
+					return false;
+				})));
+
+				delete this->dynamic_plugins.back();
+				this->dynamic_plugins.pop_back();
+
+				std::cout << "\tRemoved.\n";
+
+				return;
+			}
 		}
 
-		return cmds;
+		throw std::runtime_error("No such plugin could be removed: " + name);
 	}
 
 	void Bot::listen() {
@@ -198,10 +239,13 @@ namespace IRC {
 		/* Here we go through the user-added Commands */
 		for (auto command : this->commands) {    /* checks sender's perms.... */
 			if (command->triggered(p) && (sender_is_admin || !command->requires_admin())) {
+
 				command->run(p);
 
 				std::lock_guard<std::mutex> guard(this->stat_mutex); // stat-tracking commands requires this :)
 				this->commands_executed++;
+
+				break;
 			}
 		}
 

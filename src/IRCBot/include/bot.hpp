@@ -16,6 +16,7 @@
 #include "./command-interface.hpp"
 #include "./server.hpp"
 #include "./packet.hpp"
+#include "./dynamic-loading.hpp"
 
 namespace IRC {
 
@@ -30,6 +31,7 @@ namespace IRC {
 		std::vector< Server* > servers;
 
 		std::vector<CommandInterface*> commands;
+		std::vector<DynamicPluginLoading::DynamicPlugin*> dynamic_plugins;
 
 		std::string recovery_password_sha256;
 
@@ -40,7 +42,8 @@ namespace IRC {
 		std::mutex stat_mutex,
 		           admin_mutex,
 		           ignored_mutex,
-				   commands_mutex;
+				   commands_mutex,
+				   dynamic_plugins_mutex;
 				   // A servers_mutex is not needed since each server occupies its own thread and shares no data.
 
 	public:
@@ -145,12 +148,43 @@ namespace IRC {
 		void add_command( CommandInterface* cmd );
 
 		/*
-			Returns the vector of commands to the caller.
+			Adds the dynamic command located at the path (absolute or relative)
+				`name`.
 
-			The commands are immutable.
+			@param name the path/name of the shared library (.so) to dynamically
+			load into the bot.
+
+			This method also loads an instance of the shared library's implementation
+			of IRC::CommandInterface into this->commands.
 		*/
-		std::vector<const CommandInterface *> get_commands(void) const;
-		
+		void add_dynamic_command( const std::string& name );
+
+		/*
+			Removes the dynamic command stored in dynamic_plugins
+			with the name `name`.
+
+			@param name the path/name of the shared lib (.so) to dynamically
+			unload from the bot.
+
+			Note that this method also deletes and removes any commands that
+			were instantiated using code from the `name` lib.
+		*/
+		void remove_dynamic_command( const std::string& name );
+
+		template<class Func>
+		void each_command(Func f) const {
+			for (auto c : this->commands) {
+				f(c);
+			}
+		}
+
+		template<class Func>
+		void each_dynamic_plugin(Func f) const {
+			for (auto c : this->dynamic_plugins) {
+				f(c);
+			}
+		}
+
 		std::vector<std::string> get_stats(void);
 
 		/* Reads from all connected servers and responds accordingly if
