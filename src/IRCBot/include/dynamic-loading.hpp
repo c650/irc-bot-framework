@@ -11,15 +11,10 @@
 	https://www.linuxjournal.com/article/3687
 */
 
-<<<<<<< HEAD
 #include "./types.hpp"
 
 #include <string>
 #include <vector>
-=======
-#include "./command-interface.hpp"
-#include "./bot.hpp"
->>>>>>> 6dad7aef7121520652f124a30bada37239c02c4d
 
 namespace DynamicPluginLoading {
 
