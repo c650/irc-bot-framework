@@ -144,12 +144,16 @@ namespace IRC {
 				std::swap( this->dynamic_plugins[i] , this->dynamic_plugins.back());
 
 				/* considering that this function is called from the loader we already have a lock over the commands mutex. */
-				std::remove_if(this->commands.begin(), this->commands.end(), [this](IRC::CommandInterface* c){
+				this->commands.resize(
+					std::distance(this->commands.begin() , std::remove_if(this->commands.begin(), this->commands.end(), [this](IRC::CommandInterface* c){
+
 					if (this->dynamic_plugins.back()->provides_instance_of(c) ) {
-						std::cout << "Found " << c << "\n";
+						std::cout << "\tFound " << c << "\n";
+						delete c;
 						return true;
 					}
-				});
+					return false;
+				})));
 
 				delete this->dynamic_plugins.back();
 				this->dynamic_plugins.pop_back();
@@ -251,6 +255,7 @@ namespace IRC {
 		/* Here we go through the user-added Commands */
 		for (auto command : this->commands) {    /* checks sender's perms.... */
 			if (command->triggered(p) && (sender_is_admin || !command->requires_admin())) {
+
 				command->run(p);
 
 				std::lock_guard<std::mutex> guard(this->stat_mutex); // stat-tracking commands requires this :)
