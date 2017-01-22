@@ -147,14 +147,14 @@ namespace DefaultPlugins {
 
 	std::string Help::do_help_specific(const std::string& query) {
 
-		bool found = false;
-		this->bot_ptr->each_command([this, &query, &found](IRC::CommandInterface* c) {
-			std::cout << c->trigger() << '\n';
-			if (c->trigger().find(query) != std::string::npos && (found = true) && (!c->requires_admin() || this->req_admin)) {
-				return c->trigger() + " : " + c->desc();
+		std::string ret = "[ERROR] Couldn't find " + query;
+		this->bot_ptr->each_command([this, &query, &ret](IRC::CommandInterface* c) {
+			if (c->trigger().find(query) != std::string::npos && (!c->requires_admin() || this->req_admin)) {
+				ret = c->trigger() + " : " + c->desc();
+				return;
 			}
 		});
-		return found ? "" : "[ERROR] Couldn't find " + query;
+		return ret;
 	}
 
 	static void strip_string(std::string& s) {
