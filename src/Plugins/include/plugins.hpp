@@ -45,21 +45,6 @@ namespace Plugins {
 
 	};
 
-	class BabblerCommand : protected IRC::CommandInterface {
-
-		RandomLineStream rls;
-
-	  public:
-
-		BabblerCommand(const std::string& babbles_filepath)
-			: CommandInterface("@babble", "does a babble."), rls(babbles_filepath) {}
-
-		void run(const IRC::Packet& p) {
-			p.reply(rls.sample());
-		}
-
-	};
-
 	class RecoveryCommand : public IRC::CommandInterface {
 
 	  public:
