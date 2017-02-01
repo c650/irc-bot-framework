@@ -23,7 +23,10 @@ class UrbanCommand : protected IRC::CommandInterface {
 
 		get_first_result(p.content.substr(this->trigger_string.length()) , def);
 
-		if (!def.empty()) {
+		if (def.length() >= 420) {
+			p.reply("Grr. Why do you make me work, " + p.sender + "??");
+			p.owner->privmsg(p.sender , def);
+		} else if (!def.empty()) {
 			p.reply(def);
 		}
 	}
