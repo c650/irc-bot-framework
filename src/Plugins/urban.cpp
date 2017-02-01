@@ -21,14 +21,12 @@ class UrbanCommand : protected IRC::CommandInterface {
 	void run(const IRC::Packet& p) {
 		std::string def = "";
 
-		get_first_result(p.content.substr(this->trigger_string.length()) , def);
+		std::string query = p.content.substr(this->trigger_string.length());
+
+		get_first_result( query , def);
 
 		if (def.length() >= 420) {
-			p.reply("Grr. Why do you make me work, " + p.sender + "??");
-			for (size_t i = 0; i < def.length(); i += 420) {
-				p.owner->privmsg(p.sender , def.substr(i, 420));
-			}
-
+			p.reply("Grr. See for yourself. https://www.urbandictionary.com/define.php?term=" + MyHTTP::uri_encode(query));
 		} else if (!def.empty()) {
 			p.reply(def);
 		}
