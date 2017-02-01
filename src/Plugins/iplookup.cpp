@@ -37,6 +37,9 @@ static void do_lookup_internal(const std::string& host, nlohmann::json& result) 
 
 static std::string do_lookup(const std::string& host) {
 
+	if (host.empty())
+		return "Error: Needs argument.";
+
 	try {
 		std::cout << "Looking up: " << host << '\n';
 
