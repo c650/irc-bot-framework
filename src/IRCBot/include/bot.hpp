@@ -25,8 +25,8 @@ namespace IRC {
 		std::string nick;
 		std::string password;
 
-		std::vector<std::string> admins,
-								 ignored;
+		std::vector< User* > admins,
+		                     ignored;
 
 		std::vector< Server* > servers;
 
@@ -60,9 +60,8 @@ namespace IRC {
 
 			@param n the bot's nick.
 			@param pass the bot's nickserv password.
-			@param _admins a vector of strings representing the
-				current nicks of admins. Note: Admins may change their
-				nicks once the bot comes on; the bot tracks NICK changes.
+			@param _admins a vector of strings representing hostmasks of admins.
+				Note: Admins may change their nicks once the bot comes on; the bot tracks NICK changes.
 			@param sha256_recovery_pw [optional] the password to use to gain admin privs
 				from an account with a different identity.
 
@@ -123,7 +122,7 @@ namespace IRC {
 			Adds someone either to the IGNORE list or the ADMIN list.
 
 			@param r the relationship (i.e., ADMIN, or IGNORED)
-			@param user the user to relate to.
+			@param user a hostmask of the user to relate to
 		*/
 		void add_a(const RELATIONSHIP& r , const std::string& user);
 
@@ -218,12 +217,14 @@ namespace IRC {
 			@param person the person to look for in the admin list.
 			@return whether or not the person is an admin.
 		*/
-		bool _is_admin(const std::string& person);
+		bool _is_admin(const std::string& hostmask);
+		bool _is_admin(const User& user);
 
 		/*
 			Same as _is_admin but for ignored people
 		*/
-		bool _is_ignored(const std::string& person);
+		bool _is_ignored(const std::string& hostmask);
+		bool _is_ignored(const User& user);
 
 		void _listen_to_server(Server* s);
 

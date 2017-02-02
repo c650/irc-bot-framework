@@ -46,6 +46,18 @@ namespace IRC {
 			if (d)
 				delete d;
 		}
+
+		std::lock_guard<std::mutex> guard3( this->admin_mutex );
+		for (auto a : admins) {
+			if (a)
+				delete a;
+		}
+
+		std::lock_guard<std::mutex> guard4( this->ignored_mutex );
+		for (auto i : ignored) {
+			if (i)
+				delete i;
+		}
 	}
 
 	void Bot::set_recovery_sha256(const std::string& rpw) {
@@ -86,8 +98,9 @@ namespace IRC {
 			}
 
 			std::lock_guard<std::mutex> guard_admin(admin_mutex);
-			admins.push_back(user);
-			break; // this is important!
+			admins.push_back(new User(user));
+
+			return;
 
 		} case RELATIONSHIP::IGNORED: {
 
@@ -96,8 +109,9 @@ namespace IRC {
 			}
 
 			std::lock_guard<std::mutex> guard_ignored(ignored_mutex);
-			ignored.push_back(user);
-			break;
+			ignored.push_back(new User(user));
+
+			return;
 		}}
 	}
 
@@ -262,25 +276,30 @@ namespace IRC {
 		return servers.end();
 	}
 
-	bool Bot::_is_admin(const std::string& person) {
-		std::lock_guard<std::mutex> guard(this->admin_mutex); // protect admins
+	bool Bot::_is_admin(const std::string& hostmask) {
+		return _is_admin(User(hostmask));
+	}
 
-		for (auto& a : admins)
-			if (a == person)
+	bool Bot::_is_admin(const User& user) {
+		std::lock_guard<std::mutex> guard(this->admin_mutex); // protect admins
+		for (auto a : admins)
+			if (*a == user)
 				return true;
-		std::cout << person << " is not an admin.\n";
 		return false;
 	}
 
-	bool Bot::_is_ignored(const std::string& person) {
+	bool Bot::_is_ignored(const std::string& hostmask) {
+		return _is_ignored(User(hostmask));
+	}
+	
+	bool Bot::_is_ignored(const User& user) {
 		std::lock_guard<std::mutex> guard(this->ignored_mutex); // protect ignore list.
 
-		for (auto& a : ignored)
-			if (a == person)
+		for (auto a : ignored)
+			if (*a == user)
 				return true;
 		return false;
 	}
-
 
 	std::vector<std::string> Bot::get_stats(void) {
 		std::lock_guard<std::mutex> guard(this->stat_mutex);
