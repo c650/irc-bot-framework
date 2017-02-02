@@ -4,8 +4,14 @@
 
 #include "./include/packet.hpp"
 #include "./include/server.hpp"
+#include "./include/user.hpp"
 
 namespace IRC {
+
+	Packet::~Packet() {
+		if (sender_user_object)
+			delete sender_user_object;
+	}
 
 	void Packet::reply(std::string msg) const {
 		if (this->owner != nullptr)
@@ -38,6 +44,8 @@ namespace IRC {
 		found = buf.find(" ");
 		this->hostname = buf.substr(0, found);
 		buf = buf.erase(0, found+1);
+
+		this->sender_user_object = new User(this->sender, this->realname, this->hostname);
 
 		found = buf.find(" ");
 		this->type = _read_type(buf.substr(0, found));

@@ -37,6 +37,8 @@ namespace IRC {
 					content;
 		PacketType type;
 
+		User *sender_user_object;
+
 		Server *owner;
 
 	private:
@@ -49,14 +51,16 @@ namespace IRC {
 			Default constructor.
 			By default, a packet is invalid and has no owner.
 		*/
-		Packet() : valid(false), owner(nullptr) {}
+		Packet() : Packet("") {}
 
 		/*
 			@param buf the buffer to parse into a Packet. (see the declared member variables)
 		*/
-		Packet(std::string buf) : owner(nullptr) {
+		Packet(std::string buf) : owner(nullptr) : sender_user_object(nullptr) {
 			valid = _parse(buf);
 		}
+
+		~Packet();
 
 		/*
 			@returns whether or not a packet is valid.
