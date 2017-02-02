@@ -1,6 +1,7 @@
 #include "./include/bot.hpp"
 #include "./include/packet.hpp"
 #include "./include/server.hpp"
+#include "./include/user.hpp"
 
 #include "./include/default-plugins.hpp"
 
@@ -17,9 +18,14 @@ namespace IRC {
 		  start_time(std::chrono::system_clock::now()), packets_received(0), packets_sent(0), commands_executed(0),
 		  recovery_password_sha256(sha256_recovery_pw)
 	{
-		std::lock_guard<std::mutex> guard(this->admin_mutex); // just in case, because admins is a shared resource and should always be protected.
-		for (auto& a : _admins)
-			admins.push_back(a);
+		try {
+			std::lock_guard<std::mutex> guard(this->admin_mutex);
+			for (auto& a : _admins)
+				admins.push_back(new User(a));
+		} catch (std::exception& e) {
+			std::cerr << "Couldn't initialize admins: " << e.what() << '\n';
+			throw std::runtime_error("Failed to initialize bot because admins list was invalid!");
+		}
 
 		/* default commands about to make your life so much easier! */
 		this->add_command( (CommandInterface*)(new DefaultPlugins::Help(this, true)  ));
@@ -30,6 +36,7 @@ namespace IRC {
 	}
 
 	Bot::~Bot() {
+
 		for (Server* s : servers) {
 			if (s)
 				delete s;
@@ -231,8 +238,8 @@ namespace IRC {
 
 	void Bot::_check_for_triggers(const Packet& p) {
 
-		bool sender_is_admin = _is_admin(p.sender);
-		bool sender_is_ignored = _is_ignored(p.sender);
+		bool sender_is_admin = _is_admin(p.sender_user_object);
+		bool sender_is_ignored = _is_ignored(p.sender_user_object);
 
 		/* These are default commands, raw functionality, internal stuff... */
 		if (p.type == Packet::PacketType::NICK) {
@@ -240,15 +247,15 @@ namespace IRC {
 			/* update admins and ignored based on nick changes. */
 
 			std::unique_lock<std::mutex> guard_admin(admin_mutex); // using unique lock so that I can unlock before scope ends.
-			for (auto& s : admins)
-				if (s == p.sender)
-					s = p.content;
+			for (auto s : admins)
+				if (s->get_nick() == p.sender)
+					s->set_nick(p.content);
 			guard_admin.unlock();
 
 			std::lock_guard<std::mutex> guard_ignored(ignored_mutex);
-			for (auto& i : ignored)
-				if (i == p.sender)
-					i = p.content;
+			for (auto i : ignored)
+				if (i->get_nick() == p.sender)
+					i->set_nick(p.content);
 			// not unlocking because Scope ends anyway.
 
 		} else if (p.type == Packet::PacketType::INVITE && sender_is_admin) {
@@ -274,7 +281,6 @@ namespace IRC {
 				break;
 			}
 		}
-
 	}
 
 	// TODO: Just return Server*'s for less overhead and bullsh*t
@@ -292,7 +298,7 @@ namespace IRC {
 		try {
 			return _is_admin( User(hostmask) );
 		} catch (std::exception& e) {
-			std::cerr << "Error in _is_admin: " << e.what << '\n';
+			std::cerr << "Error in _is_admin: " << e.what() << '\n';
 			return false;
 		}
 	}
@@ -309,7 +315,7 @@ namespace IRC {
 		try {
 			return _is_ignored( User(hostmask) );
 		} catch (std::exception& e) {
-			std::cerr << "Error in _is_ignored: " << e.what << '\n';
+			std::cerr << "Error in _is_ignored: " << e.what() << '\n';
 			return false;
 		}
 	}

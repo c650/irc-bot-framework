@@ -8,10 +8,7 @@
 
 namespace IRC {
 
-	Packet::~Packet() {
-		if (sender_user_object)
-			delete sender_user_object;
-	}
+	Packet::~Packet() {	}
 
 	void Packet::reply(std::string msg) const {
 		if (this->owner != nullptr)
@@ -45,7 +42,7 @@ namespace IRC {
 		this->hostname = buf.substr(0, found);
 		buf = buf.erase(0, found+1);
 
-		this->sender_user_object = new User(this->sender, this->realname, this->hostname);
+		this->sender_user_object = User(this->sender, this->realname, this->hostname);
 
 		found = buf.find(" ");
 		this->type = _read_type(buf.substr(0, found));
@@ -58,7 +55,6 @@ namespace IRC {
 			this->content = buf.substr(1); // +1 for :
 			return true;
 		}
-
 
 		found = buf.find(" ");
 		this->channel = buf.substr(0, found);

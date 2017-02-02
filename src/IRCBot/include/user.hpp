@@ -13,6 +13,8 @@ namespace IRC {
 
 	public:
 
+		User() : User("","") {}
+
 		/*
 			Parses the passed mask into a nick, realname, and hostname.
 

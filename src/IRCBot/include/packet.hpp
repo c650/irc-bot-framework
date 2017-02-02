@@ -6,6 +6,7 @@
 
 #include "./types.hpp"
 #include "./server.hpp"
+#include "./user.hpp"
 
 namespace IRC {
 
@@ -37,7 +38,7 @@ namespace IRC {
 					content;
 		PacketType type;
 
-		User *sender_user_object;
+		User sender_user_object;
 
 		Server *owner;
 
@@ -56,7 +57,7 @@ namespace IRC {
 		/*
 			@param buf the buffer to parse into a Packet. (see the declared member variables)
 		*/
-		Packet(std::string buf) : owner(nullptr) : sender_user_object(nullptr) {
+		Packet(std::string buf) : owner(nullptr) {
 			valid = _parse(buf);
 		}
 

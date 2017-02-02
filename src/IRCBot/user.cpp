@@ -5,7 +5,7 @@
 
 namespace IRC {
 
-	User(std::string mask) {
+	User::User(std::string mask) {
 		static std::string error_msg = "Could not parse mask string into a user.";
 
 		try {
@@ -30,8 +30,8 @@ namespace IRC {
 
 	}
 
-	User(const std::string& n, const std::string& hn) : User(n, n, hn) {}
-	User(const std::string& n, const std::string& rn, const std::string& hn) : nick(n), realname(rn), hostname(hn) {}
+	User::User(const std::string& n, const std::string& hn) : User(n, n, hn) {}
+	User::User(const std::string& n, const std::string& rn, const std::string& hn) : nick(n), realname(rn), hostname(hn) {}
 
 	bool User::operator==(const User& other) const {
 		return this == &other || this->nick == other.nick && this->realname == other.realname && this->hostname == other.hostname;
@@ -61,7 +61,7 @@ namespace IRC {
 		hostname = new_hostname;
 	}
 
-	std::string get_mask(void) const {
+	std::string User::get_mask(void) const {
 		return nick + "!" + realname + "@" + hostname;
 	}
 }
