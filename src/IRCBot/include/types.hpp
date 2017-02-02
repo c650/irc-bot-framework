@@ -6,6 +6,8 @@ namespace IRC {
 	class Server;
 	class Bot;
 	class CommandInterface;
+
+	class User;
 }
 
 #endif
