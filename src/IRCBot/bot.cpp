@@ -90,6 +90,18 @@ namespace IRC {
 	}
 
 	void Bot::add_a(const Bot::RELATIONSHIP& r , const std::string& user) {
+
+		User *user_obj = nullptr;
+		try {
+			user_obj = new User(user);
+		} catch (std::exception& e) {
+			std::cerr << "Could not add_a with this user hostmask: " << user << '\n';
+			return;
+		}
+
+		if (user_obj == nullptr)
+			return;
+
 		switch(r) {
 		case RELATIONSHIP::ADMIN: {
 
@@ -98,7 +110,7 @@ namespace IRC {
 			}
 
 			std::lock_guard<std::mutex> guard_admin(admin_mutex);
-			admins.push_back(new User(user));
+			admins.push_back(user_obj);
 
 			return;
 
@@ -109,7 +121,7 @@ namespace IRC {
 			}
 
 			std::lock_guard<std::mutex> guard_ignored(ignored_mutex);
-			ignored.push_back(new User(user));
+			ignored.push_back(user_obj);
 
 			return;
 		}}
@@ -277,7 +289,12 @@ namespace IRC {
 	}
 
 	bool Bot::_is_admin(const std::string& hostmask) {
-		return _is_admin(User(hostmask));
+		try {
+			return _is_admin( User(hostmask) );
+		} catch (std::exception& e) {
+			std::cerr << "Error in _is_admin: " << e.what << '\n';
+			return false;
+		}
 	}
 
 	bool Bot::_is_admin(const User& user) {
@@ -289,9 +306,14 @@ namespace IRC {
 	}
 
 	bool Bot::_is_ignored(const std::string& hostmask) {
-		return _is_ignored(User(hostmask));
+		try {
+			return _is_ignored( User(hostmask) );
+		} catch (std::exception& e) {
+			std::cerr << "Error in _is_ignored: " << e.what << '\n';
+			return false;
+		}
 	}
-	
+
 	bool Bot::_is_ignored(const User& user) {
 		std::lock_guard<std::mutex> guard(this->ignored_mutex); // protect ignore list.
 
