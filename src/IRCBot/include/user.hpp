@@ -18,6 +18,12 @@ namespace IRC {
 
 		std::string get_nick();
 		void set_nick(const std::string new_nick);
+
+		std::string get_realname();
+		void set_realname(const std::string new_realname);
+
+		std::string get_hostname();
+		void set_hostname(const std::string new_hostname);
 	};
 };
 
