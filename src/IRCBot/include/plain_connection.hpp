@@ -4,6 +4,8 @@
 #include <string>
 #include "./base_connection.hpp"
 
+#include <iostream>
+
 namespace SSLWrapper {
 
 	class PlainConnection : public BaseConnection {

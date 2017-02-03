@@ -6,6 +6,7 @@
 
 #include "./types.hpp"
 #include "./server.hpp"
+#include "./user.hpp"
 
 namespace IRC {
 
@@ -37,6 +38,8 @@ namespace IRC {
 					content;
 		PacketType type;
 
+		User sender_user_object;
+
 		Server *owner;
 
 	private:
@@ -49,12 +52,14 @@ namespace IRC {
 			Default constructor.
 			By default, a packet is invalid and has no owner.
 		*/
-		Packet() : valid(false), owner(nullptr) {}
+		Packet() : Packet("") {}
 
 		/*
 			@param buf the buffer to parse into a Packet. (see the declared member variables)
 		*/
-		Packet(std::string buf) : owner(nullptr) {
+		Packet(std::string buf) : Packet(buf, nullptr) {}
+
+		Packet(std::string buf, Server *o) : owner(o) {
 			valid = _parse(buf);
 		}
 

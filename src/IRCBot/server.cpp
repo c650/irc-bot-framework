@@ -25,6 +25,7 @@ namespace IRC {
 		: name(n), connection( with_ssl ? new SSLWrapper::SSLConnection(a , p) : new SSLWrapper::PlainConnection(a , p))
 		{
 			std::cout << "Server " << n << " with" << (with_ssl ? "" : "out") << " SSL\n";
+			std::cout << "connection_ptr " << this->connection << '\n';
 		}
 
 	Server::~Server() {
@@ -69,13 +70,12 @@ namespace IRC {
 	}
 
 	Packet Server::receive() {
-
 		std::string s = this->connection->receive();
 		if (s.substr(0,4) == "PING") {
 			s.replace(0,2, "\rPO");
 			_send(s);
 		}
-		Packet p(s);
+		Packet p(s, this);
 
 		return p;
 	}
