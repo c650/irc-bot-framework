@@ -34,7 +34,7 @@ namespace IRC {
 	User::User(const std::string& n, const std::string& rn, const std::string& hn) : nick(n), realname(rn), hostname(hn) {}
 
 	bool User::operator==(const User& other) const {
-		return this == &other || this->nick == other.nick && this->realname == other.realname && this->hostname == other.hostname;
+		return this == &other || this->hostname == other.hostname;
 	}
 
 	std::string User::get_nick(void) const {
