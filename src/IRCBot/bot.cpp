@@ -223,8 +223,6 @@ namespace IRC {
 				continue;
 			}
 
-			p.owner = s;
-
 			if (p.is_valid()) {
 				this->packets_received++;
 				this->_check_for_triggers(p);
@@ -272,7 +270,6 @@ namespace IRC {
 		/* Here we go through the user-added Commands */
 		for (auto command : this->commands) {    /* checks sender's perms.... */
 			if (command->triggered(p) && (sender_is_admin || !command->requires_admin())) {
-
 				command->run(p);
 
 				std::lock_guard<std::mutex> guard(this->stat_mutex); // stat-tracking commands requires this :)

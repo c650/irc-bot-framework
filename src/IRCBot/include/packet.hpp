@@ -57,11 +57,11 @@ namespace IRC {
 		/*
 			@param buf the buffer to parse into a Packet. (see the declared member variables)
 		*/
-		Packet(std::string buf) : owner(nullptr) {
+		Packet(std::string buf) : Packet(buf, nullptr) {}
+
+		Packet(std::string buf, Server *o) : owner(o) {
 			valid = _parse(buf);
 		}
-
-		~Packet();
 
 		/*
 			@returns whether or not a packet is valid.

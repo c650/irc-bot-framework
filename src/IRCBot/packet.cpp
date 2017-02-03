@@ -8,8 +8,6 @@
 
 namespace IRC {
 
-	Packet::~Packet() {	}
-
 	void Packet::reply(std::string msg) const {
 		if (this->owner != nullptr)
 			this->owner->privmsg(this->channel, msg);

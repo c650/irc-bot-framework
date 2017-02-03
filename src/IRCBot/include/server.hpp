@@ -22,18 +22,22 @@
 
 #include "./ssl_connection.hpp"
 
+#include <iostream>
+
 namespace IRC {
 
 	class Server {
 
 		std::string name;
 
-		SSLWrapper::BaseConnection *connection;
 
 		std::string nick,
 		            pass;
 
 		std::vector< std::string > channels;
+
+		SSLWrapper::BaseConnection * const connection;
+
 
 	public:
 
@@ -119,6 +123,10 @@ namespace IRC {
 
 		bool operator==(Server& other) const {
 			return (this == &other) || (this->name == other.name && this->connection->socket_fd() == other.connection->socket_fd());
+		}
+
+		void print_connection(void) const {
+			std::cout << "connection = " << this->connection << '\n';
 		}
 
 	private:
