@@ -1,5 +1,5 @@
 /*
-	sayhi.cpp
+	weather.cpp
 */
 
 #include "../IRCBot/include/command-interface.hpp"
