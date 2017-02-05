@@ -29,7 +29,7 @@ class CurrencyCommand : protected IRC::CommandInterface {
 			MyHTTP::get(api_query, response);
 			nlohmann::json result = nlohmann::json::parse(response);
 
-			response = "As of " + result["date"].get<std::string>() + " , 1.00 " + result["base"].get<std::string>()
+			response = "As of " + result["date"].get<std::string>() + ", 1.00 " + result["base"].get<std::string>()
 						+ " will get you: ";
 
 			std::stringstream ss;
