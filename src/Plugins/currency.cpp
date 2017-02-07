@@ -9,6 +9,11 @@
 #include "./include/json.hpp"
 #include "./include/http.hpp"
 
+#include <algorithm>
+#include <cctype>
+
+static void string_clean(std::string& str);
+
 class CurrencyCommand : protected IRC::CommandInterface {
 
   public:
@@ -22,6 +27,13 @@ class CurrencyCommand : protected IRC::CommandInterface {
 		try {
 			std::string base = command.substr(0, command.find(" "));
 			std::string others = command.substr(command.find(" ")+1);
+
+			/* capitalize all base/other symbols, remove any whitespaces*/
+			string_clean(base);
+			string_clean(others);
+
+			if (others.empty())
+				return;
 
 			std::string api_query = "https://api.fixer.io/latest?base=" + base + "&symbols=" + others;
 
@@ -38,12 +50,12 @@ class CurrencyCommand : protected IRC::CommandInterface {
 				got_res = true;
 				ss << it.key() << " -> " << it.value() << ", ";
 			}
+
 			if (got_res) {
 				std::string tmp = ss.str();
 				response += tmp.substr(0, tmp.rfind(","));
+				p.reply(response);
 			}
-
-			p.reply(response);
 
 		} catch (std::exception& e) {
 			std::cerr << "Failed to answer currency query of " << command << ". Error: " << e.what() << '\n';
@@ -51,6 +63,15 @@ class CurrencyCommand : protected IRC::CommandInterface {
 		}
 	}
 };
+
+static void string_clean(std::string& str) {
+	auto it = std::remove_if(str.begin(), str.end(), [](const char& c){
+		return std::isspace(c);
+	});
+	str.resize(std::distance(str.begin(),it));
+	for (auto& c : str)
+		c = std::toupper(c);
+}
 
 extern "C" {
 
