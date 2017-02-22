@@ -22,25 +22,22 @@ class DiscourseSearch : protected IRC::CommandInterface {
 		std::string url, name, key, user;
 	};
 
-	/*static*/ std::vector<DiscourseSite> sites; // static doesn't work pretty with symbol resolution for some reason...
+	std::vector<DiscourseSite> sites;
 
   public:
 
 	DiscourseSearch() : IRC::CommandInterface("@search ", "searches a discourse. Ex. @search [Site] [User|Topic] [Search]") {
-		if (sites.empty()) {
-			try {
-				nlohmann::json sites_json = ENVIRONMENT["discourse_sites"];
-				for (auto& s : sites_json) {
-					sites.push_back({s["url"].get<std::string>(),
-					                 s["name"].get<std::string>(),
-					                 s["api_key"].get<std::string>(),
-					                 s["api_username"].get<std::string>()});
-					std::transform(sites.back().name.begin(), sites.back().name.end(), sites.back().name.begin(), ::tolower);
-				}
-
-			} catch (std::exception& e) {
-				std::cerr << "In DiscourseSearch(), couldn't parse sites: " << e.what() << '\n';
+		try {
+			nlohmann::json sites_json = ENVIRONMENT["discourse_sites"];
+			for (auto& s : sites_json) {
+				sites.push_back({s["url"].get<std::string>(),
+				                 s["name"].get<std::string>(),
+				                 s["api_key"].get<std::string>(),
+				                 s["api_username"].get<std::string>()});
+				std::transform(sites.back().name.begin(), sites.back().name.end(), sites.back().name.begin(), ::tolower);
 			}
+		} catch (std::exception& e) {
+			std::cerr << "In DiscourseSearch(), couldn't parse sites: " << e.what() << '\n';
 		}
 	}
 
@@ -48,17 +45,17 @@ class DiscourseSearch : protected IRC::CommandInterface {
 
 		p.reply("Searching as fast as I can...");
 
-		// clean/validate query.
+		/* clean/validate query. */
 		std::vector<std::string> args;
 		p.get_args(args);
 
-		if (args.size() < 4) { // @search Site Type Query...
+		if (args.size() < 4) { /* @search Site Type Query... */
 			std::cerr << "Had error in DiscourseSearch with this call: " << p.content << '\n';
 			p.reply("Error. Invalid arguments. See @help search");
 			return;
 		}
 
-		std::string site = args.at(1); // Site
+		std::string site = args.at(1); /* site */
 		std::transform(site.begin(), site.end(), site.begin(), ::tolower);
 
 		DiscourseSite* search_site = nullptr;
@@ -74,7 +71,7 @@ class DiscourseSearch : protected IRC::CommandInterface {
 			return;
 		}
 
-		std::string type = args.at(2); // Type
+		std::string type = args.at(2); /* type */
 		std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 
 		if (type != "user" && type != "topic") {
@@ -88,8 +85,7 @@ class DiscourseSearch : protected IRC::CommandInterface {
 		}
 		query = MyHTTP::uri_encode((type == "user" && !query.empty() ? "@" : "") + query + args.back());
 
-		// perform.
-
+		/* perform! */
 		try {
 			std::string response = "";
 			MyHTTP::get( search_site->url + "/search.json?include_blurgs=false"
@@ -111,10 +107,6 @@ class DiscourseSearch : protected IRC::CommandInterface {
 	}
 };
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new DiscourseSearch);
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new DiscourseSearch);
+}
