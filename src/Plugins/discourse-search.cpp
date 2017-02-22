@@ -102,6 +102,8 @@ class DiscourseSearch : protected IRC::CommandInterface {
 
 			p.reply("First Result, I found: " + results["fancy_title"].get<std::string>() + " "
 			        + search_site->url + "/t/" + std::to_string(results["id"].get<unsigned int>()));
+			p.owner->privmsg(p.sender, "To view all search results -> " + search_site->url + "/search?q=" + query);
+			
 		} catch (std::exception& e) {
 			std::cerr << "Something went wrong performing a discourse search on " << search_site->url << ": " << e.what() << '\n';
 			p.reply("Failed to search. Sorry!");
