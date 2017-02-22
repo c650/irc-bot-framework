@@ -86,7 +86,7 @@ class DiscourseSearch : protected IRC::CommandInterface {
 		for (size_t i = 3; i < args.size()-1; ++i) {
 			query += args.at(i) + " ";
 		}
-		query = MyHTTP::uri_encode(query + args.back());
+		query = MyHTTP::uri_encode((type == "user" && !query.empty() ? "@" : "") + query + args.back());
 
 		// perform.
 
@@ -98,12 +98,12 @@ class DiscourseSearch : protected IRC::CommandInterface {
 			            + "&q=" + query, response);
 			nlohmann::json results = nlohmann::json::parse(response);
 
-			results = results[type + "s"].at(0);
+			results = results["topics"].at(0); // just keep topics.
 
 			p.reply("First Result, I found: " + results["fancy_title"].get<std::string>() + " "
 			        + search_site->url + "/t/" + std::to_string(results["id"].get<unsigned int>()));
 			p.owner->privmsg(p.sender, "To view all search results -> " + search_site->url + "/search?q=" + query);
-			
+
 		} catch (std::exception& e) {
 			std::cerr << "Something went wrong performing a discourse search on " << search_site->url << ": " << e.what() << '\n';
 			p.reply("Failed to search. Sorry!");
