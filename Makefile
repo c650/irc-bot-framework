@@ -17,9 +17,6 @@ build: ${SRC}
 clean:
 	rm ./bin/bot.out
 
-# to compile the shared libraries:
-# g++ --std=c++17 -Os -c -fPIC -o ./bin/sayhi.o ./src/Plugins/sayhi.cpp
-# g++ -rdynamic -shared -o ./bin/sayhi.so ./bin/sayhi.o
-
-# or something like:
+# for dynamic plugins:
 # g++ --std=c++17 -Os -fPIC -rdynamic -shared -o ./bin/iplookup.so ./src/Plugins/http.cpp ./src/Plugins/iplookup.cpp -lcurl
+# obviously don't link curl or compile wih unnecessary files...
