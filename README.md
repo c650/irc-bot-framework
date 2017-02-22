@@ -12,8 +12,13 @@ To make a plugin/command/feature, you define a class that inherits from `Command
 1. `triggered` determines whether a certain packet's content should trigger the command.
 2. `run` performs whatever action should happen when a packet triggers the command.
 
-It is best to define these new subclasses of `CommandInterface` in [src/Plugins/include](/src/Plugins/include) like so:
+There are two ways to create plugins for a bot:
+1. In a header file, included in [main.cpp](/src/main.cpp), and added directly
+2. Or, defined in a source file, compiled separately, and loaded/unloaded dynamically.
 
+### Method 1
+
+	// src/Plugins/include/thing-plugin.hpp
     #ifndef _NAME_OF_THING_H
 	#define _NAME_OF_THING_H
 
@@ -44,7 +49,68 @@ Once you define the class, include the header in [main.cpp](/src/main.cpp).
 
 Use the following line to add the command to a bot:
 
+	#include "./Plugins/include/thing-plugin.hpp"
+	// ...
     some_bot.add_command( (IRC::CommandInterface*)(new Thing) );
+
+---
+### Method 2
+
+	// src/Plugins/thing.cpp
+
+	#include "../../IRCBot/include/command-interface.hpp"
+	#include "../../IRCBot/include/packet.hpp"
+
+	class Thing : public CommandInterface {
+
+	public:
+
+		Thing() : CommandInterface("trigger as a string for help menu", "description", /* whether or not admin privs are needed. */) {}
+
+		/* Note that constructors may specify parameters as needed. */
+
+		bool triggered(const Packet& p) {
+			/* what triggers the command */
+		}
+
+		void run(const Packet& p) {
+			/* what to do when command is triggered */
+		}
+
+	}
+
+	extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+		return (IRC::CommandInterface*)(new Thing);
+	}
+
+Compile it separately:
+
+	$ g++ -Os --std=c++17 -fPIC -rdynamic -shared -o ./bin/thing.so ./src/Plugins/thing.cpp
+
+Load it into the bot:
+
+	<you> @load ./bin/thing.so
+	<bot> Success
+
+You can also have the plugin loaded at bot startup by including it in the `"dynamic_commands"` array in your configuration JSON:
+
+	// ...
+	"bot" : {
+		"nick":"bot",
+		"pass":"",
+		"admins": [
+			"YOU"
+		],
+		"ignore" : [],
+		"recovery_sha256" : "SHA256 HASH OF PASSWORD",
+		"dynamic_commands" : [
+			"thing" // key
+		],
+		"dynamic_lib_path_prefix" : "./bin/"
+	},
+	// ...
+
+---
 
 To run the bot, information must be specified like it is in the [sample config](/sample-config.json).
 

@@ -6,7 +6,11 @@
 			"YOU"
 		],
 		"ignore" : [],
-		"recovery_sha256" : "SHA256 HASH OF PASSWORD"
+		"recovery_sha256" : "SHA256 HASH OF PASSWORD",
+		"dynamic_commands" : [
+			"sayhi"
+		],
+		"dynamic_lib_path_prefix" : "./bin/"
 	},
 
 	"servers" : {
@@ -26,5 +30,20 @@
 
 	"tinyurl" : {
 		"apikey" : "YOUR_API_KEY"
-	}
+	},
+
+	"babble" : {
+		"filepath" : "./path/to/babble-texts.txt"
+	},
+
+	"WUNDERGROUND_KEY" : "key for wunderground (only for weather plugin)",
+
+	"discourse_sites" : [
+		{
+			"name" : "meta",
+			"url" : "meta.discourse.org",
+			"api_key" : "some_key",
+			"api_username" : "john_smith"
+		}
+	]
 }
