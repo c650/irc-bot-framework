@@ -1,8 +1,9 @@
 *.exe
 *.out
 *.o
+*.so
 
-customize/*
+customize/
 bin/
 
 config.json
