@@ -25,10 +25,14 @@ namespace MyHTTP {
 
 		@param url the target for POST
 		@param params the post parameters to send.
+		@param response the string in which the HTTP POST response will be written.
 
 		@return if POST was successful.
 	*/
-	bool post(const std::string& url, const nlohmann::json& params);
+	bool post(const std::string& url, const std::string& params, std::string& response);
+
+	// un-developed overload.
+	bool post(const std::string& url, const nlohmann::json& params, std::string& response);
 
 	/*
 		Encodes a string with URI compliance.

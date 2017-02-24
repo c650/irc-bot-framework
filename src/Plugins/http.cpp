@@ -15,16 +15,30 @@ namespace MyHTTP {
 		return realsize;
 	}
 
+	template <typename WriteFunc>
+	static CURL* do_curl_setup(const std::string& url, WriteFunc func, std::string& response_string) {
+		CURL *curl = curl_easy_init();
+		if (curl) {
+			curl_easy_setopt(curl, CURLOPT_URL, url.data());
+			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, func);
+			curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_string);
+			return curl;
+		}
+		return nullptr;
+	}
+
 	static void _parse_params(const nlohmann::json& params, std::string& p) {
-		// try {
-		// 	for (auto element = params.begin(); element != params.end() ; ++element) {
-		// 		p.append((*element).key().get<std::string>() + "=" + (*element).value().get<std::string>() + "&");
-		// 	}
-		// 	p.pop_back(); // remove last '&'
-		// } catch (std::exception& e) {
-		// 	std::cerr << "Failed to parse params: " << e.what() << '\n';
-		// 	p = "";
-		// }
+		/*
+		try {
+			for (auto element = params.begin(); element != params.end() ; ++element) {
+				p.append((*element).key().get<std::string>() + "=" + (*element).value().get<std::string>() + "&");
+			}
+			p.pop_back(); // remove last '&'
+		} catch (std::exception& e) {
+			std::cerr << "Failed to parse params: " << e.what() << '\n';
+			p = "";
+		}
+		*/
 		p="";
 	}
 
@@ -35,50 +49,38 @@ namespace MyHTTP {
 			std::cout << "MyHTTP::get( " << url << " )\n";
 		#endif
 
-		CURL *curl = curl_easy_init();
-		CURLcode res = CURLE_OK;
+		CURL *curl = do_curl_setup(url, write_to_string, response);
 		if (curl) {
-
-			curl_easy_setopt(curl, CURLOPT_URL, url.data());
-
-			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
-
-			res = curl_easy_perform(curl);
+			CURLcode res = curl_easy_perform(curl);
 			curl_easy_cleanup(curl);
+			return res == CURLE_OK;
 		}
-		return res == CURLE_OK;
+		return false;
 	}
 
-	/* This remains untested (1/1/17) : */
-	bool post(const std::string& url, const nlohmann::json& params, std::string& response) {
-
+	/* untested (2/24/17) */
+	bool post(const std::string& url, const std::string& params, std::string& response) {
 		#ifdef DEBUG
 			std::cout << "MyHTTP::post( " << url << " , " << params << " )\n";
 		#endif
 
-		CURL *curl = curl_easy_init();
-		CURLcode res = CURLE_OK;
-
+		CURL *curl = do_curl_setup(url, write_to_string, response);
 		if (curl) {
+			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, params.data());
 
-			curl_easy_setopt(curl, CURLOPT_URL, url.data());
-
-			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_to_string);
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, response);
-
-			std::string p = "";
-			_parse_params(params, p);
-			if (p.empty()) {
-				curl_easy_cleanup(curl);
-				return false;
-			}
-			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, p.data());
-
-			res = curl_easy_perform(curl);
+			CURLcode res = curl_easy_perform(curl);
 			curl_easy_cleanup(curl);
+
+			return res == CURLE_OK;
 		}
-		return res == CURLE_OK;
+		return false;
+	}
+
+	/* This remains untested (1/1/17) : */
+	bool post(const std::string& url, const nlohmann::json& params, std::string& response) {
+		std::string p = "";
+		_parse_params(params, p);
+		return post(url, p, response); /* calls other one. */
 	}
 
 	std::string uri_encode(const std::string& unformatted) {
