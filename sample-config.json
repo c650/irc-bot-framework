@@ -13,14 +13,14 @@
 		"dynamic_lib_path_prefix" : "./bin/"
 	},
 
-	"servers" : {
-		"Freenode" : {
+	"servers" : [
+		{
 			"name" : "Freenode",
 			"address" : "irc.freenode.net",
 			"port" : 6667,
 			"with_ssl": false
 		}
-	},
+	],
 
 	"google_search" : {
 		"cx": "YOUR_CX_HERE",
