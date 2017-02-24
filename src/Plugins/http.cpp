@@ -7,40 +7,20 @@
 
 namespace MyHTTP {
 
-	/* to store result of GET in stream */
-	static size_t write_to_string(void *ptr, size_t size, size_t nmemb, std::string& stream) {
-		size_t realsize = size * nmemb;
-		std::string temp(static_cast<const char*>(ptr), realsize);
-		stream.append(temp);
-		return realsize;
-	}
+/*
+	HELPER
+	Prototypes.
+*/
+	/* to store result of GET/POST in stream */
+	static size_t write_to_string(void *ptr, size_t size, size_t nmemb, std::string& stream);
 
-	template <typename WriteFunc>
-	static CURL* do_curl_setup(const std::string& url, WriteFunc func, std::string& response_string) {
-		CURL *curl = curl_easy_init();
-		if (curl) {
-			curl_easy_setopt(curl, CURLOPT_URL, url.data());
-			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, func);
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_string);
-			return curl;
-		}
-		return nullptr;
-	}
+	template <typename WriteFunc> /* gotta love templates! */
+	static CURL* do_curl_setup(const std::string& url, WriteFunc func, std::string& response_string);
 
-	static void _parse_params(const nlohmann::json& params, std::string& p) {
-		/*
-		try {
-			for (auto element = params.begin(); element != params.end() ; ++element) {
-				p.append((*element).key().get<std::string>() + "=" + (*element).value().get<std::string>() + "&");
-			}
-			p.pop_back(); // remove last '&'
-		} catch (std::exception& e) {
-			std::cerr << "Failed to parse params: " << e.what() << '\n';
-			p = "";
-		}
-		*/
-		p="";
-	}
+	/* ideally, converts JSON params into a string-form and stores it in p. */
+	static void _parse_params(const nlohmann::json& params, std::string& p);
+
+/* ------------*/
 
 	/* see .hpp for docs */
 	bool get(const std::string& url, std::string& response) {
@@ -102,6 +82,43 @@ namespace MyHTTP {
 		}
 
 		return result;
+	}
+
+/* -----------------*/
+	/* HELPERS */
+
+	static size_t write_to_string(void *ptr, size_t size, size_t nmemb, std::string& stream) {
+		size_t realsize = size * nmemb;
+		std::string temp(static_cast<const char*>(ptr), realsize);
+		stream.append(temp);
+		return realsize;
+	}
+
+	template <typename WriteFunc>
+	static CURL* do_curl_setup(const std::string& url, WriteFunc func, std::string& response_string) {
+		CURL *curl = curl_easy_init();
+		if (curl) {
+			curl_easy_setopt(curl, CURLOPT_URL, url.data());
+			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, func);
+			curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_string);
+			return curl;
+		}
+		return nullptr;
+	}
+
+	static void _parse_params(const nlohmann::json& params, std::string& p) {
+		/*
+		try {
+			for (auto element = params.begin(); element != params.end() ; ++element) {
+				p.append((*element).key().get<std::string>() + "=" + (*element).value().get<std::string>() + "&");
+			}
+			p.pop_back(); // remove last '&'
+		} catch (std::exception& e) {
+			std::cerr << "Failed to parse params: " << e.what() << '\n';
+			p = "";
+		}
+		*/
+		p="";
 	}
 
 };
