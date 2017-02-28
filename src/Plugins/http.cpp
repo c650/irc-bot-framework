@@ -4,6 +4,7 @@
 #include <stdexcept>
 
 #include "./include/json.hpp"
+#include "./include/http.hpp"
 
 namespace MyHTTP {
 
@@ -14,53 +15,52 @@ namespace MyHTTP {
 	/* to store result of GET/POST in stream */
 	static size_t write_to_string(void *ptr, size_t size, size_t nmemb, std::string& stream);
 
-	template <typename WriteFunc> /* gotta love templates! */
-	static CURL* do_curl_setup(const std::string& url, WriteFunc func, std::string& response_string);
-
 	/* ideally, converts JSON params into a string-form and stores it in p. */
 	static void _parse_params(const nlohmann::json& params, std::string& p);
 
 /* ------------*/
 
 	/* see .hpp for docs */
-	bool get(const std::string& url, std::string& response) {
+	std::string get(const std::string& url) {
 
 		#ifdef DEBUG
 			std::cout << "MyHTTP::get( " << url << " )\n";
 		#endif
 
-		CURL *curl = do_curl_setup(url, write_to_string, response);
-		if (curl) {
-			CURLcode res = curl_easy_perform(curl);
-			curl_easy_cleanup(curl);
-			return res == CURLE_OK;
-		}
-		return false;
+		std::string response;
+
+		CURLHandle curl_handle;
+		CURLcode res = curl_handle.do_setup(url, write_to_string, response).perform();
+		if (res != CURLE_OK)
+			throw std::runtime_error("HTTP GET of " + url + " failed with CURLcode: " + std::to_string(res));
+
+		return response;
 	}
 
 	/* untested (2/24/17) */
-	bool post(const std::string& url, const std::string& params, std::string& response) {
+	std::string post(const std::string& url, const std::string& params) {
 		#ifdef DEBUG
 			std::cout << "MyHTTP::post( " << url << " , " << params << " )\n";
 		#endif
 
-		CURL *curl = do_curl_setup(url, write_to_string, response);
-		if (curl) {
-			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, params.data());
+		std::string response;
 
-			CURLcode res = curl_easy_perform(curl);
-			curl_easy_cleanup(curl);
+		CURLHandle curl_handle;
+		curl_handle.do_setup(url, write_to_string, response);
+		curl_easy_setopt(curl_handle.curl_ptr, CURLOPT_POSTFIELDS, params.data());
 
-			return res == CURLE_OK;
-		}
-		return false;
+		CURLcode res = curl_handle.perform();
+		if (res != CURLE_OK)
+			throw std::runtime_error("HTTP POST of " + url + " with params: " + params + " failed. CURLcode: " + std::to_string(res));
+
+		return response;
 	}
 
 	/* This remains untested (1/1/17) : */
-	bool post(const std::string& url, const nlohmann::json& params, std::string& response) {
+	std::string post(const std::string& url, const nlohmann::json& params) {
 		std::string p = "";
 		_parse_params(params, p);
-		return post(url, p, response); /* calls other one. */
+		return post(url, p); /* calls other one. */
 	}
 
 	std::string uri_encode(const std::string& unformatted) {
@@ -94,18 +94,6 @@ namespace MyHTTP {
 		return realsize;
 	}
 
-	template <typename WriteFunc>
-	static CURL* do_curl_setup(const std::string& url, WriteFunc func, std::string& response_string) {
-		CURL *curl = curl_easy_init();
-		if (curl) {
-			curl_easy_setopt(curl, CURLOPT_URL, url.data());
-			curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, func);
-			curl_easy_setopt(curl, CURLOPT_WRITEDATA, response_string);
-			return curl;
-		}
-		return nullptr;
-	}
-
 	static void _parse_params(const nlohmann::json& params, std::string& p) {
 		/*
 		try {
@@ -120,5 +108,22 @@ namespace MyHTTP {
 		*/
 		p="";
 	}
+
+	/* CURLHandle Implementation */
+
+	CURLHandle::CURLHandle() : CURLHandle(nullptr) {}
+	CURLHandle::CURLHandle(CURL* _curl_ptr) : curl_ptr(_curl_ptr) {}
+
+	CURLHandle::~CURLHandle() {
+		if (this->curl_ptr != nullptr)
+			curl_easy_cleanup(this->curl_ptr);
+	}
+
+	CURLcode CURLHandle::perform(void) {
+		if (this->curl_ptr == nullptr)
+			throw std::logic_error("Cannot perform the CURL action on a nullptr!");
+		return curl_easy_perform(this->curl_ptr);
+	}
+
 
 };

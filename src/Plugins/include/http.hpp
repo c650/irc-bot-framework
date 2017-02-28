@@ -12,12 +12,10 @@ namespace MyHTTP {
 		Uses Libcurl to perform a get request to some URL.
 
 		@param url the url to GET with HTTP
-		@param response the string in which the response will be
-			stored. It is up to the user to parse it to JSON or whatever.
 
-		@return whether or not the response was a CURLE_OK.
+		@return the response data.
 	*/
-	bool get(const std::string& url, std::string& response);
+	std::string get(const std::string& url);
 
 
 	/*
@@ -25,14 +23,13 @@ namespace MyHTTP {
 
 		@param url the target for POST
 		@param params the post parameters to send.
-		@param response the string in which the HTTP POST response will be written.
 
-		@return if POST was successful.
+		@return the response data.
 	*/
-	bool post(const std::string& url, const std::string& params, std::string& response);
+	std::string post(const std::string& url, const std::string& params);
 
 	// un-developed overload.
-	bool post(const std::string& url, const nlohmann::json& params, std::string& response);
+	std::string post(const std::string& url, const nlohmann::json& params);
 
 	/*
 		Encodes a string with URI compliance.
@@ -42,6 +39,40 @@ namespace MyHTTP {
 	*/
 	std::string uri_encode(const std::string& unformatted);
 
+	/* CURL Handle struct for RAII*/
+	struct CURLHandle {
+
+		CURL* curl_ptr;
+
+		CURLHandle();
+		CURLHandle(CURL* _curl_ptr);
+
+		~CURLHandle();
+
+		/*
+			Does basic setup stuff.
+		*/
+		template <typename WriteFunc>
+		CURLHandle& do_setup(const std::string& url, WriteFunc func, std::string& response_string)  {
+			if (curl_ptr == nullptr)
+				curl_ptr = curl_easy_init();
+
+			if (curl_ptr) {
+				curl_easy_setopt(curl_ptr, CURLOPT_URL, url.data());
+				curl_easy_setopt(curl_ptr, CURLOPT_WRITEFUNCTION, func);
+				curl_easy_setopt(curl_ptr, CURLOPT_WRITEDATA, response_string);
+				return *this;
+			}
+			throw std::runtime_error("Failed to initialize the CURL*");
+		}
+
+		/*
+			Internally calls curl_easy_perform.
+			Throws std::logic_error if curl_ptr is nullptr.
+		*/
+		CURLcode perform(void);
+
+	};
 };
 
 #endif
