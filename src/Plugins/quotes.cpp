@@ -27,13 +27,8 @@ class QuoteCommand : protected IRC::CommandInterface {
 static std::string get_random_quote(void) {
 
 	try {
-		std::string response = "";
-		MyHTTP::get("https://favqs.com/api/qotd", response);
-
-		nlohmann::json data = nlohmann::json::parse(response);
-
+		nlohmann::json data = nlohmann::json::parse(MyHTTP::get("https://favqs.com/api/qotd"));
 		return data["quote"]["body"].get<std::string>() + " -- " + data["quote"]["author"].get<std::string>();
-
 	} catch (std::exception& e) {
 		std::cerr << "Failed in get_random_quote(): " << e.what() << '\n';
 	}

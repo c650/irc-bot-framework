@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 static void strip_line_endings(std::string& str);
-static void get_first_result(const std::string& query, std::string& res);
+static std::string get_first_result(const std::string& query);
 
 class UrbanCommand : protected IRC::CommandInterface {
 
@@ -19,11 +19,10 @@ class UrbanCommand : protected IRC::CommandInterface {
 		: CommandInterface("@urban ", "checks urban dictionary for a definition.") {}
 
 	void run(const IRC::Packet& p) {
-		std::string def = "";
 
 		std::string query = p.content.substr(this->trigger_string.length());
 
-		get_first_result( query , def);
+		std::string def = get_first_result( query );
 
 		if (def.length() >= 420) {
 			p.reply("Grr. See for yourself. https://www.urbandictionary.com/define.php?term=" + MyHTTP::uri_encode(query));
@@ -34,24 +33,18 @@ class UrbanCommand : protected IRC::CommandInterface {
 
 };
 
-static void get_first_result(const std::string& query, std::string& res) {
-
-	std::string response = "";
-	if ( !MyHTTP::get("http://api.urbandictionary.com/v0/define?term=" + MyHTTP::uri_encode(query) , response ) ) {
-		res = "";
-		return;
-	}
-
+static std::string get_first_result(const std::string& query) {
+	std::string res = "Unknown.";
 	try {
-		nlohmann::json data = nlohmann::json::parse(response);
+		nlohmann::json data = nlohmann::json::parse(MyHTTP::get("http://api.urbandictionary.com/v0/define?term=" + MyHTTP::uri_encode(query)));
 		if (data["result_type"] == "exact") {
 			res = data["list"].at(0)["definition"];
 			strip_line_endings(res);
 		}
 	} catch (std::exception& e) {
 		std::cerr << "Failed in Urban::get_first_result: " << e.what() << '\n';
-		res = "";
 	}
+	return res;
 }
 
 static void strip_line_endings(std::string& str) {

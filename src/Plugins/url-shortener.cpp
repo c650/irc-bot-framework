@@ -21,10 +21,10 @@ namespace ShortenURL {
 			                  + ENVIRONMENT["tinyurl"]["api_key"].get<std::string>()
 							  + "&url=" + MyHTTP::uri_encode(long_url);
 
-			MyHTTP::get(url, response);
+			response = MyHTTP::get(url);
 		} catch (std::exception& e) {
 			std::cerr << "Failed to shorten the URL " << long_url << " because: " << e.what() << '\n';
-			response = ""; // just in case.
+			response = "";
 		}
 
 		return response;

@@ -23,15 +23,10 @@ class IPLookupCommand : protected IRC::CommandInterface {
 };
 
 static void do_lookup_internal(const std::string& host, nlohmann::json& result) {
-	std::string response = "";
-	if ( !MyHTTP::get("http://freegeoip.net/json/" + host, response) ) {
-		return;
-	}
-
 	try {
-		result = nlohmann::json::parse(response);
-	} catch (...) {
-		std::cerr << "Couldn't parse: " << response << '\n';
+		result = nlohmann::json::parse(MyHTTP::get("http://freegeoip.net/json/" + host));
+	} catch (std::exception& e) {
+		std::cerr << "IPLookup Failure in do_lookup_internal: " << e.what() << '\n';
 	}
 }
 

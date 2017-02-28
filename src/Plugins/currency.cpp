@@ -36,12 +36,9 @@ class CurrencyCommand : protected IRC::CommandInterface {
 				return;
 
 			std::string api_query = "https://api.fixer.io/latest?base=" + base + "&symbols=" + others;
+			nlohmann::json result = nlohmann::json::parse(MyHTTP::get(api_query));
 
-			std::string response = "";
-			MyHTTP::get(api_query, response);
-			nlohmann::json result = nlohmann::json::parse(response);
-
-			response = "As of " + result["date"].get<std::string>() + ", 1.00 " + result["base"].get<std::string>()
+			std::string response = "As of " + result["date"].get<std::string>() + ", 1.00 " + result["base"].get<std::string>()
 						+ " will get you: ";
 
 			std::stringstream ss;

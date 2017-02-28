@@ -19,12 +19,7 @@ class BitcoinCommand : protected IRC::CommandInterface {
 
 	void run(const IRC::Packet& p) {
 		try {
-			std::string response = "";
-			MyHTTP::get("http://api.coindesk.com/v1/bpi/currentprice.json", response);
-
-			std::cout << response << '\n';
-
-			nlohmann::json data = nlohmann::json::parse(response);
+			nlohmann::json data = nlohmann::json::parse(MyHTTP::get("http://api.coindesk.com/v1/bpi/currentprice.json"));
 
 			p.reply("$" + data["bpi"]["USD"]["rate"].get<std::string>() + " as of: " + data["time"]["updated"].get<std::string>());
 
