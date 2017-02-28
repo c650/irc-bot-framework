@@ -49,10 +49,6 @@ public:
 
 };
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new ChooseCommand);
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new ChooseCommand);
+}

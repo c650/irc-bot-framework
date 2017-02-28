@@ -30,8 +30,6 @@ class BitcoinCommand : protected IRC::CommandInterface {
 	}
 };
 
-extern "C" {
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new BitcoinCommand);
-	}
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new BitcoinCommand);
+}

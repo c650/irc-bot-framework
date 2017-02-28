@@ -63,10 +63,6 @@ class UtilityCommands : protected IRC::CommandInterface {
 	}
 };
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new UtilityCommands(b));
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new UtilityCommands(b));
+}

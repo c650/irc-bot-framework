@@ -45,8 +45,6 @@ public:
 	}
 };
 
-extern "C" {
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new EliteCommand);
-	}
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new EliteCommand);
+}

@@ -33,10 +33,6 @@ class LMGTFYCommand : protected IRC::CommandInterface {
 
 };
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new LMGTFYCommand);
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new LMGTFYCommand);
+}

@@ -46,10 +46,6 @@ static std::string get_stock_summary(const std::string& q) {
 	return "Failed to look up: " + q;
 }
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new StocksCommand);
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new StocksCommand);
+}

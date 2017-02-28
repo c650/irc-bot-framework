@@ -24,10 +24,6 @@ class BabblerCommand : protected IRC::CommandInterface {
 
 };
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new BabblerCommand);
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new BabblerCommand);
+}

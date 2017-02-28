@@ -54,10 +54,6 @@ static void strip_line_endings(std::string& str) {
 	}
 }
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot *b = nullptr) {
-		return (IRC::CommandInterface*)(new UrbanCommand);
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot *b = nullptr) {
+	return (IRC::CommandInterface*)(new UrbanCommand);
+}

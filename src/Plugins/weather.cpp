@@ -60,8 +60,6 @@ class WeatherCommand : protected IRC::CommandInterface {
 	}
 };
 
-extern "C" {
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new WeatherCommand);
-	}
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new WeatherCommand);
+}

@@ -25,8 +25,6 @@ class NullerCommand : protected IRC::CommandInterface {
 	}
 };
 
-extern "C" {
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new NullerCommand);
-	}
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new NullerCommand);
+}

@@ -49,10 +49,6 @@ static std::string do_lookup(const std::string& host) {
 	}
 }
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot *b = nullptr) {
-		return (IRC::CommandInterface*)(new IPLookupCommand);
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot *b = nullptr) {
+	return (IRC::CommandInterface*)(new IPLookupCommand);
+}

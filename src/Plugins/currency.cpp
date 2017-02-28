@@ -70,10 +70,6 @@ static void string_clean(std::string& str) {
 		c = std::toupper(c);
 }
 
-extern "C" {
-
-	IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
-		return (IRC::CommandInterface*)(new CurrencyCommand);
-	}
-
-};
+extern "C" IRC::CommandInterface* maker(IRC::Bot* b = nullptr) {
+	return (IRC::CommandInterface*)(new CurrencyCommand);
+}
