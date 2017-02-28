@@ -26,19 +26,13 @@ class WeatherCommand : protected IRC::CommandInterface {
 		query = MyHTTP::uri_encode(query);
 
 		try {
-			std::string search_response = "";
-			MyHTTP::get( "http://autocomplete.wunderground.com/aq?query=" + query , search_response );
-
-			nlohmann::json result = nlohmann::json::parse(search_response);
+			nlohmann::json result = nlohmann::json::parse(MyHTTP::get( "http://autocomplete.wunderground.com/aq?query=" + query));
 			result = result["RESULTS"].at(0);
 
 			std::string lat_long = result["lat"].get<std::string>() + "," + result["lon"].get<std::string>();
 
-			search_response = "";
 			std::string url = "http://api.wunderground.com/api/" + ENVIRONMENT["WUNDERGROUND_KEY"].get<std::string>() + "/geolookup/q/" + lat_long + ".json";
-
-			MyHTTP::get( url , search_response );
-			result = nlohmann::json::parse(search_response);
+			result = nlohmann::json::parse(MyHTTP::get( url ));
 
 			std::string locale = result["location"]["country"].get<std::string>() == "US" ?
 									result["location"]["state"].get<std::string>() : result["location"]["country"].get<std::string>();
@@ -48,11 +42,8 @@ class WeatherCommand : protected IRC::CommandInterface {
 				 if (c == ' ')
 				 	c = '_';
 
-			search_response = "";
-			MyHTTP::get( "http://api.wunderground.com/api/" + ENVIRONMENT["WUNDERGROUND_KEY"].get<std::string>() + "/conditions/q/" + locale + "/" + city + ".json",
-							search_response );
-			result = nlohmann::json::parse(search_response);
-			result = result["current_observation"];
+			url = "http://api.wunderground.com/api/" + ENVIRONMENT["WUNDERGROUND_KEY"].get<std::string>() + "/conditions/q/" + locale + "/" + city + ".json";
+			result = nlohmann::json::parse(MyHTTP::get( url ))["current_observation"];
 
 			std::string weather_result = "Weather for " + result["display_location"]["full"].get<std::string>()
 								+ ": " + result["weather"].get<std::string>() + ", " + result["temperature_string"].get<std::string>()

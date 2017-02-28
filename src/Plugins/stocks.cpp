@@ -29,9 +29,8 @@ class StocksCommand : protected IRC::CommandInterface {
 
 static std::string get_stock_summary(const std::string& q) {
 	try {
-		std::string response = "";
-
-		MyHTTP::get("https://www.google.com/finance/info?q=" + MyHTTP::uri_encode(q.substr(0, q.find(" ")) ), response);
+		std::string response = MyHTTP::get("https://www.google.com/finance/info?q=" +
+		                                   MyHTTP::uri_encode(q.substr(0, q.find(" ")) ));
 
 		response.erase(0, 5); // erase first five characters.
 		response.erase(response.length()-2); // and last two characters.
