@@ -39,6 +39,7 @@ static std::string get_first_result(const std::string& query) {
 		nlohmann::json data = nlohmann::json::parse(MyHTTP::get("http://api.urbandictionary.com/v0/define?term=" + MyHTTP::uri_encode(query)));
 		if (data["result_type"] == "exact") {
 			res = data["list"].at(0)["definition"];
+			res += " [*] Ex. \x1D" + data["list"].at(0)["example"].get<std::string>() + "\x1D";
 			strip_line_endings(res);
 		}
 	} catch (std::exception& e) {
