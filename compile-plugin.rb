@@ -1,7 +1,8 @@
-#! /bin/env ruby
+#!/usr/bin/ruby
 
 if ARGV.empty?
 	puts "Usage: ./compile-plugin.rb [plugin_name] [--with-curl]"
+	exit
 end
 
 plugin_name = ARGV[0]
