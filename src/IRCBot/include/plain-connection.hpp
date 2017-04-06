@@ -2,7 +2,7 @@
 #define _PLAIN_CONNECTION_H
 
 #include <string>
-#include "./base_connection.hpp"
+#include "./base-connection.hpp"
 
 #include <iostream>
 

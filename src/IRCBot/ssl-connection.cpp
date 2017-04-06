@@ -1,5 +1,4 @@
-#include "./include/plain_connection.hpp"
-#include "./include/ssl_connection.hpp"
+#include "./include/ssl-connection.hpp"
 
 #include <iostream>
 

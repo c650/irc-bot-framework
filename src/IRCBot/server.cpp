@@ -17,7 +17,10 @@
 #include <iostream>
 
 #include "./include/packet.hpp"
-#include "./include/ssl_connection.hpp"
+
+#include "./include/base-connection.hpp"
+#include "./include/plain-connection.hpp"
+#include "./include/ssl-connection.hpp"
 
 namespace IRC {
 

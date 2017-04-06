@@ -20,7 +20,7 @@
 #include "./server.hpp"
 #include "./packet.hpp"
 
-#include "./ssl_connection.hpp"
+#include "./base-connection.hpp"
 
 #include <iostream>
 

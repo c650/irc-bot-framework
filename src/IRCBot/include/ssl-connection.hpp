@@ -10,7 +10,7 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
-#include "./plain_connection.hpp"
+#include "./plain-connection.hpp"
 
 /*
 	If you're reading this, get ready for headaches. This is OpenSSL stuff.
