@@ -71,7 +71,7 @@ class ReminderCommand : protected IRC::CommandInterface {
 			return;
 		}
 
-		reminders.push_back(new Reminder(p.sender, command.substr(first_space+1), std::stoll(command.substr(0, first_space)), p.owner));
+		reminders.push_back(new Reminder(p.sender, command.substr(first_space+1), std::stoll(command.substr(0, first_space)) * 60, p.owner));
 		p.reply("Ok. I'll keep that in mind.");
 	}
 };
