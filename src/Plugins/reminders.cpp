@@ -63,16 +63,20 @@ class ReminderCommand : protected IRC::CommandInterface {
 
 	void run(const IRC::Packet& p) {
 		/* this will ADD a new Reminder */
-		std::string command = p.content.substr(p.content.find(" ")+1); // skip over @remind
+		try {
+			std::string command = p.content.substr(p.content.find(" ")+1); // skip over @remind
 
-		size_t first_space = command.find(" ");
-		if (first_space == std::string::npos) {
-			p.reply("Error: you've not requested enough info. @help remind for more.");
-			return;
+			size_t first_space = command.find(" ");
+			if (first_space == std::string::npos) {
+				p.reply("Error: you've not requested enough info. @help remind for more.");
+				return;
+			}
+
+			reminders.push_back(new Reminder(p.sender, command.substr(first_space+1), std::stoll(command.substr(0, first_space)) * 60, p.owner));
+			p.reply("Ok. I'll keep that in mind.");
+		} catch (...) {
+			p.reply("ERROR: Invalid input. See @help remind");
 		}
-
-		reminders.push_back(new Reminder(p.sender, command.substr(first_space+1), std::stoll(command.substr(0, first_space)) * 60, p.owner));
-		p.reply("Ok. I'll keep that in mind.");
 	}
 };
 
