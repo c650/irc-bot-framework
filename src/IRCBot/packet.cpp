@@ -15,6 +15,22 @@ namespace IRC {
 
 	bool Packet::_parse(std::string buf) {
 
+		/*
+			parse OTHER packets
+			Ex. :irc.bleh.com 69 bot * :End of /NAMES list.
+		 */
+		size_t first_space = buf.find(" ");
+		if (first_space < buf.length()-1 && std::isdigit(buf[first_space+1])) {
+			this->sender = this->realname = buf.substr(1, first_space-1);
+			this->channel = "";
+			first_space = buf.find(" ", first_space+1); /* skip over number */
+			first_space = buf.find(" ", first_space+1); /* skip over NICK */
+			this->content = buf.substr(first_space+1);
+
+			this->type = PacketType::OTHER;
+			return true;
+		}
+
 		if (buf.find("!") == std::string::npos || buf.find("@") == std::string::npos) {
 			content = buf;
 			return false;
