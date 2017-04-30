@@ -6,6 +6,8 @@
 
 #include "./json.hpp"
 
+#include "./environment.hpp"
+
 namespace MyHTTP {
 
 	/*
@@ -61,6 +63,9 @@ namespace MyHTTP {
 				curl_easy_setopt(curl_ptr, CURLOPT_URL, url.data());
 				curl_easy_setopt(curl_ptr, CURLOPT_WRITEFUNCTION, func);
 				curl_easy_setopt(curl_ptr, CURLOPT_WRITEDATA, response_string);
+
+				if (!ENVIRONMENT["user_agent"].is_null())
+					curl_easy_setopt(curl_ptr, CURLOPT_USERAGENT, ENVIRONMENT["user_agent"].get<std::string>().data());
 				return *this;
 			}
 			throw std::runtime_error("Failed to initialize the CURL*");
