@@ -145,6 +145,7 @@ void NewsCommand::get_news(void) {
 	articles.clear(); /* flush any old articles out... */
 	news_track.clear(); /* all new news so refresh news_track (all articles marked unread) */
 
+	stuffle(sources); /* switch up the source order each period... */
 	for(auto& source : sources) {
 		get_news_from_src(source);
 		if (articles.size() >= MAX_NEWS)
