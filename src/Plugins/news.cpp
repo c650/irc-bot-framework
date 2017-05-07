@@ -19,29 +19,33 @@
 
 class NewsCommand : protected IRC::CommandInterface {
 
-	std::string api_key, category, newsapi_url;
+	/* to keep track of articles and cache link shortening... */
+	struct Article {
+		std::string title, desc, link, string_form;
 
-	const size_t MAX_NEWS;
-	const std::chrono::hours MAX_NO_UPDATE_TIME;
+		Article(const std::string& t, const std::string& d, const std::string& l)
+			: title(t), desc(d), link(l) {}
+
+		std::string to_string(void) {
+			if (string_form.empty()) {
+				std::string url = ShortenURL::get_shortened_url(link);
+				string_form = title + " -> " + (url.empty() ? link : url);
+			}
+			return string_form;
+		}
+	};
+
+	std::string api_key, category, newsapi_url;
 
 	std::vector<std::string> sources; /* tracks name of sources. API will handle the URLs. */
 
 	/* tracks if user has already been sent some article. */
 	std::unordered_map<std::string, std::vector<bool>> news_track;
 
-	struct Article {
-		std::string title, desc, link;
-
-		Article(const std::string& t, const std::string& d, const std::string& l)
-			: title(t), desc(d), link(l) {}
-
-		std::string to_string(void) {
-			std::string url = ShortenURL::get_shortened_url(link);
-			return title + " -> " + (url.empty() ? link : url);
-		}
-	};
-
+	const size_t MAX_NEWS;
 	std::vector<Article> articles;
+
+	const std::chrono::hours MAX_NO_UPDATE_TIME;
 	std::chrono::system_clock::time_point last_time; /* last time news was updated... */
 
 	void get_sources(void);
@@ -85,22 +89,19 @@ class NewsCommand : protected IRC::CommandInterface {
 			find news article that caller hasn't seen yet
 			and return that
 		*/
-		if (articles.empty())
-			p.owner->privmsg(p.sender,"empty.");
-
-		p.owner->privmsg(p.sender,"One sec...");
-
 		if (news_track.find(p.sender) == news_track.end())
 			news_track[p.sender] = std::vector<bool>(articles.size(), false);
+
+		if (articles.empty() && news_track[p.sender].back()) {
+			p.owner->privmsg(p.sender,"No new news at the moment.");
+			return;
+		}
+
+		p.owner->privmsg(p.sender,"One sec...");
 
 		size_t i = 0;
 		while(i < articles.size() && news_track[p.sender][i])
 			++i;
-
-		if (i >= articles.size()) {
-			p.reply("No new news at the moment.");
-			return;
-		}
 
 		news_track[p.sender][i] = true;
 		p.owner->privmsg(p.sender, articles.at(i).to_string());
@@ -162,7 +163,6 @@ static void stuffle(std::vector<T>& arr) {
 }
 
 void NewsCommand::get_news_from_src(const std::string& source) {
-
 	try {
 		std::string call = MyHTTP::get(newsapi_url + "/articles?sortBy=latest&source=" + source + "&apiKey=" + api_key);
 		auto json_obj = nlohmann::json::parse(call);
