@@ -13,10 +13,9 @@
 
 /* taken from currency.cpp */
 static void string_clean(std::string& str) {
-	auto it = std::remove_if(str.begin(), str.end(), [](const char& c){
-		return std::isspace(c);
-	});
-	str.resize(std::distance(str.begin(),it));
+	while(str.length() > 1 && str[0] == ' ')
+		str = str.substr(1);
+	if (str == " ") str = "";
 }
 
 class TranslateCommand : protected IRC::CommandInterface {
@@ -35,7 +34,9 @@ class TranslateCommand : protected IRC::CommandInterface {
 		}
 
 		try {
-			auto json_obj = nlohmann::json::parse(MyHTTP::get("http://www.transltr.org/api/translate?text=" + content + "&to=en"));
+			auto ret = MyHTTP::get("http://www.transltr.org/api/translate?text=" + MyHTTP::uri_encode(content) + "&to=en");
+			std::cout << ret << '\n';
+			auto json_obj = nlohmann::json::parse(ret);
 			p.reply(json_obj["translationText"]);
 		} catch (std::exception& e) {
 			std::cerr << "Error in TranslateCommand::run(...): " << e.what() << '\n';
