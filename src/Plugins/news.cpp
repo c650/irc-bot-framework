@@ -129,12 +129,11 @@ void NewsCommand::get_sources(void) {
 }
 
 void NewsCommand::update_nicks(const std::string& old, const std::string& _new) {
-	// for (auto& pair : news_track) {
-	// 	if (pair.first == old) {
-	// 		pair.first = _new;
-	// 		break;
-	// 	}
-	// }
+	auto it = news_track.find(old);
+	if (it != news_track.end()) {
+		news_track[_new] = news_track[old];
+		news_track.erase(it);
+	}
 }
 
 template<typename T>
