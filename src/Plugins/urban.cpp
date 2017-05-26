@@ -9,9 +9,11 @@
 #include <stdexcept>
 
 static void strip_line_endings(std::string& str);
-static std::string get_first_result(const std::string& query);
+static std::string get_nth_result(const std::string& query, size_t n);
 
 class UrbanCommand : protected IRC::CommandInterface {
+
+	static const size_t MAX_DEF_LEN = 420; /* Maximum character length of definition and example. */
 
   public:
 
@@ -22,9 +24,20 @@ class UrbanCommand : protected IRC::CommandInterface {
 
 		std::string query = p.content.substr(this->trigger_string.length());
 
-		std::string def = get_first_result( query );
+		size_t n = 1, loc;
+		if ((loc = query.find(" ")) != std::string::npos) {
+			try {
+				n = (size_t)std::stoi(query);
+				query = query.substr(loc + 1);
+			} catch (...) {
+				n = 1;
+			}
+		}
 
-		if (def.length() >= 420) {
+		// std::string def = get_first_result( query );
+		std::string def = get_nth_result( query , n );
+
+		if (def.length() >= MAX_DEF_LEN) {
 			p.reply("Grr. See for yourself. https://www.urbandictionary.com/define.php?term=" + MyHTTP::uri_encode(query));
 		} else if (!def.empty()) {
 			p.reply(def);
@@ -33,14 +46,23 @@ class UrbanCommand : protected IRC::CommandInterface {
 
 };
 
-static std::string get_first_result(const std::string& query) {
+static std::string get_nth_result(const std::string& query, size_t n) {
 	std::string res = "Unknown.";
+
+	if (n != 0) /* move n from 1-based to 0-based. */
+		--n;    /* but only if n isn't 0 already (avoid underflow) */
+
 	try {
 		nlohmann::json data = nlohmann::json::parse(MyHTTP::get("http://api.urbandictionary.com/v0/define?term=" + MyHTTP::uri_encode(query)));
 		if (data["result_type"] == "exact") {
-			res = data["list"].at(0)["definition"];
+			if (n >= data["list"].size()) {
+				res = "No " + n;
+				res += "th entry for " + query; // one-liner wasn't working :|
+				return res;
+			}
+			res = data["list"].at(n)["definition"];
 
-			std::string example = data["list"].at(0)["example"].get<std::string>();
+			std::string example = data["list"].at(n)["example"].get<std::string>();
 			if (!example.empty())
 				res += " [*] Ex. \x1D" + example + "\x1D";
 
