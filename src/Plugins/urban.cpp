@@ -9,7 +9,7 @@
 #include <stdexcept>
 
 static void strip_line_endings(std::string& str);
-static std::string get_nth_result(const std::string& query, size_t n);
+static std::string get_nth_result(const std::string& query, int n);
 
 class UrbanCommand : protected IRC::CommandInterface {
 
@@ -24,10 +24,11 @@ class UrbanCommand : protected IRC::CommandInterface {
 
 		std::string query = p.content.substr(this->trigger_string.length());
 
-		size_t n = 1, loc;
+		size_t loc;
+		int n = 1;
 		if ((loc = query.find(" ")) != std::string::npos) {
 			try {
-				n = (size_t)std::stoi(query);
+				n = std::stoi(query);
 				query = query.substr(loc + 1);
 			} catch (...) {
 				n = 1;
@@ -46,11 +47,10 @@ class UrbanCommand : protected IRC::CommandInterface {
 
 };
 
-static std::string get_nth_result(const std::string& query, size_t n) {
+static std::string get_nth_result(const std::string& query, int n) {
 	std::string res = "Unknown.";
 
-	if (n != 0) /* move n from 1-based to 0-based. */
-		--n;    /* but only if n isn't 0 already (avoid underflow) */
+	n = std::max(0, n-1);
 
 	try {
 		nlohmann::json data = nlohmann::json::parse(MyHTTP::get("http://api.urbandictionary.com/v0/define?term=" + MyHTTP::uri_encode(query)));
