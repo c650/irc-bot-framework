@@ -28,14 +28,23 @@ class UrbanCommand : protected IRC::CommandInterface {
 		int n = 1;
 		if ((loc = query.find(" ")) != std::string::npos) {
 			try {
-				n = std::stoi(query);
-				query = query.substr(loc + 1);
-			} catch (...) {
-				n = 1;
+				std::string tmp = query.substr(0, 3); /* let's only take 3 digit number max */
+
+				n = std::stoi(tmp);
+
+				query = query.substr(loc+1);
+			} catch (std::out_of_range& e) {
+				std::cerr << "Error in UrbanCommand::run(): " << e.what() << '\n';
+				return;
+			} catch (std::exception& e) {
+				std::cerr << "Error in UrbanCommand::run(): " << e.what() << '\n';
+				// std::cout << "Error in UrbanCommand::run(): " << e.what() << '\n';
 			}
 		}
 
-		// std::string def = get_first_result( query );
+		if (query.empty()) return;
+		std::cout << "UrbanCommand::run(): value of n is: " << n << '\n';
+
 		std::string def = get_nth_result( query , n );
 
 		if (def.length() >= MAX_DEF_LEN) {
@@ -55,10 +64,9 @@ static std::string get_nth_result(const std::string& query, int n) {
 	try {
 		nlohmann::json data = nlohmann::json::parse(MyHTTP::get("http://api.urbandictionary.com/v0/define?term=" + MyHTTP::uri_encode(query)));
 		if (data["result_type"] == "exact") {
-			if (n >= data["list"].size()) {
-				res = "No " + n;
-				res += "th entry for " + query; // one-liner wasn't working :|
-				return res;
+			if ((size_t)n >= data["list"].size()) {
+				return "No " + std::to_string((int)(n+1))
+				      + "th entry for " + query;
 			}
 			res = data["list"].at(n)["definition"];
 
