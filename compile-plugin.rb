@@ -15,7 +15,7 @@ if ARGV.length >= 2
 	deps += ARGV.last unless with_curl
 end
 
-command = "g++ -Os --std=c++17 -fPIC -shared -rdynamic -o ./bin/#{plugin_name}.so ./src/Plugins/#{plugin_name}.cpp #{deps} #{with_curl ? "./src/Plugins/http.cpp -lcurl" : ""}"
+command = "g++ -Werror -Wall -Os --std=c++17 -fPIC -shared -rdynamic -o ./bin/#{plugin_name}.so ./src/Plugins/#{plugin_name}.cpp #{deps} #{with_curl ? "./src/Plugins/http.cpp -lcurl" : ""}"
 
 puts command
 output = `#{command}`
