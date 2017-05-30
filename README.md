@@ -8,6 +8,8 @@ Anyone is free to customize it, add to it, or even contribute in making a better
 
 The code in [src/IRCBot](/src/IRCBot) is what is needed to use this framework.
 
+___Note:___ _Plugins are now located in [irc-bot-plugins](https://github.com/c650/irc-bot-plugins)._
+
 To make a plugin/command/feature, you define a class that inherits from `CommandInterface`. This class has two important methods to be overridden:
 1. `triggered` determines whether a certain packet's content should trigger the command.
 2. `run` performs whatever action should happen when a packet triggers the command.
