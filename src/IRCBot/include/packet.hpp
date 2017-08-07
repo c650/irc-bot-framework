@@ -78,14 +78,6 @@ namespace IRC {
 		*/
 		void reply(std::string msg) const;
 
-		/*
-			Splits a packet's content along spaces.
-
-			@param vec the vector of strings in which the parsed args
-				will be saved.
-		*/
-		void get_args(std::vector<std::string>& vec) const;
-
 	private:
 
 		/*

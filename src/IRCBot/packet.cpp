@@ -81,20 +81,6 @@ namespace IRC {
 		return true;
 	}
 
-	void Packet::get_args( std::vector<std::string>& vec ) const {
-		std::cout << "Analyzing: " << content << "\n";
-
-		size_t last = 0, next = 0;
-		while(last < content.length() && (next = content.find(" ", last)) != std::string::npos) {
-			vec.push_back(content.substr(last, next-last));
-
-			last = next+1;
-			while(last < content.length() && content[last] == ' ')
-				last++;
-		}
-		vec.push_back(content.substr(last));
-	}
-
 	Packet::PacketType Packet::_read_type(const std::string& t) {
 		if (t == "PRIVMSG")
 			return PacketType::PRIVMSG;
