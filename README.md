@@ -20,11 +20,6 @@ As of commit e6c30387021bfbdbc36e459c37b276e7da32657e, `make` compiles the bot s
 I have added a few commands as an example, but they needn't stay if you don't want them to.
 
 ---
-# Acknowledgements
-
-Thanks to @nlohmann for his [C++ JSON Library](https://github.com/nlohmann/json).
-
----
 # License
 
 This project is licensed under the [MIT License](/LICENSE).
