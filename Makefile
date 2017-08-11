@@ -1,11 +1,14 @@
+# This Makefile compiles the IRCBot code into a shared object file for linking into
+# an executable that makes use of the bot's code.
+
 CC= g++
-CFLAGS= --std=c++17 -rdynamic
+CFLAGS= --std=c++17 -rdynamic -fPIC -shared
 
 LDLIBS= -lcurl -lcrypto -lssl -lpthread -ldl
 LDFLAGS= -L/usr/lib/x86_64-linux-gnu
 
-SRC= src/IRCBot/*.cpp src/main.cpp
-OUT= bin/bot.out
+SRC= src/IRCBot/*.cpp
+OUT= bin/libbot.so
 
 OPTIMIZE= -Os # reduce code size...
 
@@ -15,8 +18,4 @@ build: ${SRC}
 .PHONY: clean static
 
 clean:
-	rm ./bin/bot.out
-
-# for dynamic plugins:
-# g++ --std=c++17 -Os -fPIC -rdynamic -shared -o ./bin/iplookup.so ./src/Plugins/http.cpp ./src/Plugins/iplookup.cpp -lcurl
-# obviously don't link curl or compile wih unnecessary files...
+	rm ${OUT}
