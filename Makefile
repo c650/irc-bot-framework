@@ -8,7 +8,7 @@ LDLIBS= -lcurl -lcrypto -lssl -lpthread -ldl
 LDFLAGS= -L/usr/lib/x86_64-linux-gnu
 
 SRC= src/IRCBot/*.cpp
-OUT= bin/libbot.so
+OUT= bin/libbot.a
 
 OPTIMIZE= -Os # reduce code size...
 
