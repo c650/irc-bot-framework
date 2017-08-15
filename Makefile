@@ -2,10 +2,9 @@
 # an executable that makes use of the bot's code.
 
 CC= g++
-CFLAGS= --std=c++17 -rdynamic -fPIC -shared
+CFLAGS= --std=c++17 -shared -fPIC
 
-LDLIBS= -lcurl -lcrypto -lssl -lpthread -ldl
-LDFLAGS= -L/usr/lib/x86_64-linux-gnu
+
 
 SRC= src/IRCBot/*.cpp
 OUT= bin/libbot.a
@@ -13,9 +12,13 @@ OUT= bin/libbot.a
 OPTIMIZE= -Os # reduce code size...
 
 build: ${SRC}
-	${CC} ${OPTIMIZE} ${CFLAGS} -o ${OUT} ${SRC} ${LDFLAGS} ${LDLIBS}
+	${CC} ${OPTIMIZE} ${CFLAGS} -c ${SRC}
+	ar -cvq ${OUT} *.o
+	rm *.o
 
 .PHONY: clean static
 
 clean:
 	rm ${OUT}
+
+# ${CC} -o ${OUT} *.o ${LDFLAGS} ${LDLIBS} -shared
