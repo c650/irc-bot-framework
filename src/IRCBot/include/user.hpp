@@ -20,7 +20,7 @@ namespace IRC {
 
 			A valid mask: "nick!realname@hostname"
 		*/
-		User(std::string mask);
+		User(const std::string& mask);
 
 		User(const std::string& n, const std::string& hn);
 		User(const std::string& n, const std::string& rn, const std::string& hn);
