@@ -270,7 +270,12 @@ namespace IRC {
 		/* Here we go through the user-added Commands */
 		for (auto command : this->commands) {    /* checks sender's perms.... */
 			if (command->triggered(p) && (sender_is_admin || !command->requires_admin())) {
-				command->run(p);
+
+				try { /* let's add a try/catch to reduce number of preventable crashes. */
+					command->run(p);
+				} catch (std::exception& e) {
+					std::cerr << "Error with command \'" << command->trigger() << "\': " << e.what() << '\n';
+				}
 
 				std::lock_guard<std::mutex> guard(this->stat_mutex); // stat-tracking commands requires this :)
 				this->commands_executed++;
