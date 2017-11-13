@@ -2,28 +2,31 @@
 
 #include <string>
 #include <stdexcept>
+#include <regex>
+
+#include <iostream>
 
 namespace IRC {
 
 	User::User(std::string mask) {
-		static std::string error_msg = "Could not parse mask string into a user.";
+
+		const static std::regex USER_REGEX{"([-\\w\\d]+)!([-\\w\\d]+)@([\\w\\d\\.]+)"};
+
+		const static std::string error_msg = "Could not parse mask string into a user.";
 
 		try {
-			size_t exclam = mask.find("!");
-			if (exclam == std::string::npos) {
+
+			std::smatch match;
+			if (!std::regex_search(mask, match, USER_REGEX)) {
 				throw std::runtime_error(error_msg);
 			}
 
-			nick = mask.substr(0, exclam);
+			nick     = match[1];
+			realname = match[2];
+			hostname = match[3];
 
-			size_t at_char = mask.find("@", exclam+1);
-			if (at_char == std::string::npos) {
-				throw std::runtime_error(error_msg);
-			}
+			std::cout << nick << " " << realname << " " << hostname << "\n";
 
-			realname = mask.substr(exclam+1 , at_char - exclam - 1);
-
-			hostname = mask.substr(at_char+1);
 		} catch (...) {
 			throw std::runtime_error(error_msg);
 		}
