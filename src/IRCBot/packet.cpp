@@ -6,77 +6,61 @@
 #include "./include/server.hpp"
 #include "./include/user.hpp"
 
+#include <regex>
+
 namespace IRC {
 
-	void Packet::reply(std::string msg) const {
+	void Packet::reply(const std::string& msg) const {
 		if (this->owner != nullptr)
 			this->owner->privmsg(this->channel, msg);
 	}
 
-	bool Packet::_parse(std::string buf) {
+	bool Packet::_parse(const std::string& buf) {
+
+		const static std::regex PACKET_REGEX{"\r?:(\\S+) (\\w+)(?:\\s+)?([^:\\s]+)? :?(.+)?\r?\n?"};
 
 		if (buf.find("!") == std::string::npos || buf.find("@") == std::string::npos) {
-			content = buf;
+			this->content = buf;
 			return false;
 		}
 
 		std::cout << "Analyzing : " << buf;
 
-		/* Get rid of \r\n */
-		buf.pop_back();
-		buf.pop_back();
-
-		size_t found = buf.find("!");
-		this->sender = buf.substr(1, found - 1); // gets user between : and !
-		buf = buf.erase(0, found+1);
-
-		found = buf.find("@");
-		this->realname = buf.substr(0, found); // skip over ~
-		if (!this->realname.empty() && this->realname.front() == '~')
-			this->realname.erase(this->realname.begin());
-		buf = buf.erase(0, found+1);
-
-		found = buf.find(" ");
-		this->hostname = buf.substr(0, found);
-		buf = buf.erase(0, found+1);
-
-		this->sender_user_object = User(this->sender, this->realname, this->hostname);
-
-		found = buf.find(" ");
-		this->type = _read_type(buf.substr(0, found));
-		buf = buf.erase(0, found+1);
-
-		if (this->type == PacketType::JOIN || this->type == PacketType::PART) {
-			this->channel = buf.substr(this->type == PacketType::JOIN ? 1 : 0);
-			return true;
-		} else if (this->type == PacketType::NICK) {
-			this->content = buf.substr(1); // +1 for :
-			return true;
+		std::smatch match;
+		if (!std::regex_search(buf, match, PACKET_REGEX)) {
+			std::cout << buf << " does not match.\n";
+			return false;
 		}
 
-		found = buf.find(" ");
-		this->channel = buf.substr(0, found);
-		buf = buf.erase(0, found+1);
+		try {
+			this->sender_user_object = User(match[1].str());
+
+			this->sender = this->sender_user_object.get_nick();
+			this->realname = this->sender_user_object.get_realname();
+			this->hostname = this->sender_user_object.get_hostname();
+		} catch (...) {
+			this->content = buf;
+			return false;
+		}
+
+		this->type = _read_type(match[2].str());
+
+		this->channel = match[3].str();
+		this->content = match[4].str();
+
+		if (this->type == PacketType::JOIN || (this->type == PacketType::PART && this->channel.empty())) {
+			this->channel = match[4].str();
+		}
 
 		if (this->channel.front() != '#')
 			this->channel = sender;
 
-		this->content = buf;
-
-		if ( !this->content.empty() && ( this->type == PacketType::PRIVMSG || this->type == PacketType::NOTICE))
-			this->content.erase(this->content.begin());
-
-		if (this->type == PacketType::NICK)
-			this->channel.erase(this->channel.begin()); // skip : in NICK messages
-
-		std::cout << "\tPacket successfully analyzed.\n";
-		std::cout << "\tsender: " << this->sender
+		std::cout << "\tPacket successfully analyzed.\n"
+		          << "\tsender: " << this->sender
 		          << "\n\trealname: " << this->realname
 				  << "\n\thostname: " << this->hostname
 				  << "\n\tchannel: " << this->channel
 				  << "\n\tcontent: " << this->content << '\n';
-
-				//   << "\n\ttype: " << this->type
 
 		return true;
 	}

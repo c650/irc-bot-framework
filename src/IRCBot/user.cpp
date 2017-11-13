@@ -8,7 +8,7 @@
 
 namespace IRC {
 
-	User::User(std::string mask) {
+	User::User(const std::string& mask) {
 
 		const static std::regex USER_REGEX{"([-\\w\\d]+)!([-\\w\\d]+)@([\\w\\d\\.]+)"};
 
@@ -24,8 +24,6 @@ namespace IRC {
 			nick     = match[1];
 			realname = match[2];
 			hostname = match[3];
-
-			std::cout << nick << " " << realname << " " << hostname << "\n";
 
 		} catch (...) {
 			throw std::runtime_error(error_msg);

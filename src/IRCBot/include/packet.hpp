@@ -57,9 +57,9 @@ namespace IRC {
 		/*
 			@param buf the buffer to parse into a Packet. (see the declared member variables)
 		*/
-		Packet(std::string buf) : Packet(buf, nullptr) {}
+		Packet(const std::string& buf) : Packet(buf, nullptr) {}
 
-		Packet(std::string buf, Server *o) : owner(o) {
+		Packet(const std::string& buf, Server *o) : owner(o) {
 			valid = _parse(buf);
 		}
 
@@ -76,7 +76,7 @@ namespace IRC {
 
 			@param msg the message to send.
 		*/
-		void reply(std::string msg) const;
+		void reply(const std::string& msg) const;
 
 	private:
 
@@ -85,7 +85,7 @@ namespace IRC {
 
 			@param buf the buffer to parse.
 		*/
-		bool _parse(std::string buf);
+		bool _parse(const std::string& buf);
 
 		/*
 			Determines type from string
